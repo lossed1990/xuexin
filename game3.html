@@ -3,17 +3,12 @@
 <html>
 <head>
     <title>粗加工练习</title>
-    <link rel="stylesheet" type="text/css" href="">
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
 
-    <!-- 新 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/common.css">
 
-    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
     <script src="js/jquery.min.js"></script>
-
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/commonfunc.js"></script>
 
@@ -57,18 +52,13 @@
 
     <script type="text/javascript">
     //============全局配置信息============
-        //结果集
-        var g_arrayResult = ['A','D','C','C','D','D','C','A','D','A','C','B','D','C','B','A','A','A','C','D','C','C','D','D','C','C','D','C','C','D','C','A','A','D','B','B','C','D','C','A','C','B','A','D'];
-        //Tip相关的定时器和当前步骤值
+        var g_arrayResult = ['A','D','C','C','D','D','C','A','D','A','C','B','D','C','B','A','A','A','C','D','C','C','D','D','C','C','D','C','C','D','C','A','A','C','B','B','C','D','C','A','C','B','A','D'];
         var g_timerTip = null;
         var g_nTipStep = 0;
-        //选取的题目编号
         var g_nQuestionId = 1;
-        //当前选择项
         var m_nCurrentSelect = null;
         
         function selectPic() {
-            //g_nQuestionId = parseInt(Math.random() * 46 + 1, 10);
             if(g_nQuestionId > 46) {
                 g_nQuestionId = 1;
             }
@@ -227,7 +217,6 @@
     <button id="btnGame2" class="btnGame2" type="button" onclick="openGame2()">记忆容量练习</button>
     <button id="btnGame3" class="btnGame3" type="button" onclick="">粗加工练习</button>
     <button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>
-    <!--<button id="btnTest" class="btnTest" type="button" onclick="openTest()">综合测验</button>-->
 
     <button id="btnResultTip" class="btnResultTip" type="button"></button>
     <button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button>
@@ -256,7 +245,6 @@
         showTip();
 
         function onRectClick() {
-            //console.log(event.target);
             if (event.target.state === 1) {
 
                 event.target.style.borderColor = 'white';
@@ -276,5 +264,4 @@
         }
     </script>
 </body>
-
 </html>

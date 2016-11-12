@@ -1,20 +1,14 @@
 ﻿<!doctype html>
 
 <html>
-
 <head>
     <title>注意稳定性练习</title>
-    <link rel="stylesheet" type="text/css" href="">
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
 
-    <!-- 新 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/common.css">
 
-    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
     <script src="js/jquery.min.js"></script>
-
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/commonfunc.js"></script>
 
@@ -29,23 +23,6 @@
             background-color: #8AC4FF;
         }
         
-        /*#divButton {
-            position: absolute;
-            text-align: center;
-        }*/
-        
-          
-        
-       
-        
-        /*#btnResultTip {
-            left: 2%;
-            top: 92%;
-            width: 10%;
-            height: 6%;
-            font-size: 18px;
-        }*/
-
         #btnGame1 {          
             background-color: #D7BA7D;
         }
@@ -63,52 +40,34 @@
 
     <script type="text/javascript">
     //============全局配置信息============
-        //结果集,随机选取的星星
         var g_arrayResult = new Array();
-        //var g_arrayResult = [0, 1, 2];
-        //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
-        //其他相关定时器
         var g_timerMove = null;
         var g_timerFlash = null;
         var g_timerGame = null;
-        //小球个数
+
         var g_nBallCount = 10;
-        //小球默认（基础）宽度
         var g_nBallBaseWidth = 70;
-        //当前选择的小球数
         var g_nSelectBallCount = 0;
-        //是否可以开始选择区域，答题
         var g_bCanClickBall = false;
-        //游戏完成的次数,用以增加难度
         var g_nTotalPlayCount = 0;
-        //小球状态枚举
+
         var NORMAL = 1;
         var CLICKED = 2;
         var STOP = 3;
         var RESULT = 4;
-        //小球信息
+
         var m_arrayBallInfo = new Array();
-        //小球坐标
         var m_arrayBallPosX = new Array();
         var m_arrayBallPosY = new Array();
-        //小球当前宽度
         var m_nBallCurrentWidth;
-        //小球在x,y轴移动的增量 
         var m_arraydirectX = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
         var m_arraydirectY = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-        //移动区域范围
         var baseLeftLine =   [0.0, 0.5, 0.0, 0.5, 0.0, 0.3, 0.0, 0.3, 0.7, 0.2];
         var baseRightLine =  [0.5, 1.0, 0.5, 1.0, 1.0, 0.7, 0.3, 0.7, 0.7, 0.8];
         var baseTopLine =    [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.3, 0.7, 0.3, 0.2];
         var baseButtomLine = [0.5, 0.5, 1.0, 1.0, 1.0, 0.3, 0.7, 1.0, 1.0, 0.8];
-
-        //小球移动区域
-        //var baseLeftLine =   [0.0, 0.5, 0.2, 0.3, 0.6, 0.5, 0.7, 0.1, 0.4, 0.6];
-        //var baseRightLine =  [0.5, 1.0, 0.8, 0.9, 1.0, 0.7, 0.9, 0.9, 0.8, 0.9];
-        //var baseTopLine =    [0.0, 0.0, 0.1, 0.2, 0.6, 0.3, 0.7, 0.2, 0.2, 0.4];
-        //var baseButtomLine = [1.0, 1.0, 0.7, 0.6, 0.9, 0.8, 0.9, 0.7, 0.8, 0.5];
 
         function checkBallIsSamePos(x,y){
             for(var i = 0; i<m_arrayBallInfo.length;i++){
@@ -121,7 +80,6 @@
         }
 
         function newGame(){
-            //根据区域随机取点
             m_arrayBallInfo.length = 0;
             g_arrayResult.length = 0;
 
@@ -146,19 +104,14 @@
                 }else{
                     newBallObject.dy = -1;   
                 }
-
-                console.log("x:" + newBallObject.x + " y:" + newBallObject.y + " dx:" + newBallObject.dx + " dy:" + newBallObject.dy);
-
                 m_arrayBallInfo.push(newBallObject);
             }
 
-            //随机选择结果集
-            var nResultBallCount = Math.min(parseInt(g_nTotalPlayCount / 5,10) + 3,6);
-            console.log(nResultBallCount);
+            var nResultBallCount = Math.min(parseInt(g_nTotalPlayCount / 15,10) + 3,6);
             for (var i = 0; i < nResultBallCount; ++i) {
-                var nIndex = parseInt(Math.random() * 10, 10); //随机选取星星
+                var nIndex = parseInt(Math.random() * 10, 10); 
                 while(g_arrayResult.indexOf(nIndex) != -1){
-                    nIndex = parseInt(Math.random() * 10, 10); //以防重复
+                    nIndex = parseInt(Math.random() * 10, 10);
                 }
 
                 g_arrayResult.push(nIndex);
@@ -170,7 +123,7 @@
                 return;
             }
 
-            g_timerMove = setInterval("moveAllBall()", 20);
+            g_timerMove = setInterval("moveAllBall()", 16);
         }
 
         function stopMoveBall() {
@@ -224,13 +177,8 @@
                     $("#tippoint5").attr("class", "");
                     $("#tippoint6").attr("class", "");
                     $("#tippoint7").attr("class", "");
-
-                    //startFlashBall();
                     break;
                 case 1:
-                    //stopFlashBall();
-                    //startMoveBall();
-
                     $("#tip1").html("当圆球运动停止后它们会变为正方形。");
                     $("#tip2").html("请用鼠标点选出之前闪烁的追踪目标进行作答。");
 
@@ -243,8 +191,6 @@
                     $("#tippoint7").attr("class", "");
                     break;
                 case 2:
-                    //stopMoveBall();
-
                     $("#tip1").html("鼠标单击一次即为选中，被选中的目标显示橙色边框；");
                     $("#tip2").html("再点击一次则取消选择。");
 
@@ -312,7 +258,7 @@
             g_timerGame = setTimeout(function(){
                 stopMoveBall();
                 g_bCanClickBall = true;  
-            },5000);     
+            },6500);     
         }
 
         function stopGame() {
@@ -378,34 +324,7 @@
                 startGame();
                 btnOk.innerHTML = "确认选择";    
             }
-        }
-
-        // function clickButton() {
-
-        //     g_timerTip = setInterval("StartTips()", 5000);
-
-        //     // if (g_timerMove == null) {
-        //     //     startMoveBall();
-        //     //     document.getElementById("btnOk").innerHTML = "停止";
-        //     // } else {
-        //     //     stopMoveBall();
-        //     //     document.getElementById("btnOk").innerHTML = "开始";
-        //     // }
-        // }
-
-        // function clickButton1() {
-        //     if (g_timerFlash == null) {
-        //         startFlashBall();
-        //         document.getElementById("btnOk").innerHTML = "停止";
-        //     } else {
-        //         stopFlashBall();
-        //         document.getElementById("btnOk").innerHTML = "开始";
-        //     }
-        // }
-
-        
-
-        
+        }       
     </script>
 </head>
 
@@ -426,7 +345,6 @@
     <button id="btnGame2" class="btnGame2" type="button" onclick="openGame2()">记忆容量练习</button>
     <button id="btnGame3" class="btnGame3" type="button" onclick="openGame3()">粗加工练习</button>
     <button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>
-    <!--<button id="btnTest" class="btnTest" type="button" onclick="openTest()">综合测验</button>-->
 
     <button id="btnResultTip" class="btnResultTip" type="button"></button>
     <button id="btnOk" class="btnOk" type="button" onclick="clickButton()">开始测试</button>
@@ -466,28 +384,18 @@
         changeSpeed();
         moveAllBall();
 
-        //初始化所有球的位置   
         function InitAllBallPosition() {
             newGame();
             for(var i = 0; i < m_arrayBallInfo.length; i++) {
                 m_arrayBallPosX[i] = divMoveRect.offsetWidth * m_arrayBallInfo[i].x;
                 m_arrayBallPosY[i] = divMoveRect.offsetHeight * m_arrayBallInfo[i].y;
             }
-            // for (var i = 0; i < baseLeftLine.length; i++) {
-            //     m_arrayBallPosX[i] = divMoveRect.offsetWidth * baseLeftLine[i];
-            // }
-
-            // for (var j = 0; j < baseTopLine.length; j++) {
-            //     m_arrayBallPosY[j] = divMoveRect.offsetHeight * baseTopLine[j];
-            // }
         }
 
-        //更新小球大小
         function changeBallWidth() {
             m_nBallCurrentWidth = (g_nBallBaseWidth * Math.min(divMoveRect.offsetWidth, divMoveRect.offsetHeight)) / 800.0;
         }
 
-        //更新移动速度 
         function changeSpeed() {
             for (var i = 0; i < g_nBallCount; i++) {
                 m_arraydirectX[i] = divMoveRect.offsetWidth / 800.0;
@@ -495,7 +403,6 @@
             }
         }
 
-        //移动某个小球
         function moveSignleBall(id, index, bMove) {
             m_arrayBallPosX[index] += 2 * m_arraydirectX[index];
             m_arrayBallPosY[index] += 2 * m_arraydirectY[index];
@@ -597,15 +504,6 @@
                 btnOk.disabled = 'disabled';
             }
         }
-
-        // function BeforeGame() {
-        //     window.location.href = "game3.html";
-        // }
-
-        // function NextGame() {
-        //     window.location.href = "game2.html";
-        // }
     </script>
 </body>
-
 </html>
