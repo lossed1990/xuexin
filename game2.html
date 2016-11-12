@@ -1,6 +1,7 @@
 ﻿<!doctype html>
 
 <html>
+
 <head>
     <title>记忆容量练习</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
@@ -22,7 +23,7 @@
             border: 1px solid silver;
             background-color: #8AC4FF;
         }
-      
+        
         .rect {
             width: 16%;
             height: 16%;
@@ -32,14 +33,14 @@
             position: absolute;
             border: 2px solid silver;
         }
-
-        #btnGame2 {          
+        
+        #btnGame2 {
             background-color: #D7BA7D;
         }
     </style>
 
     <script type="text/javascript">
-    //============全局配置信息============
+        //============全局配置信息============
         var g_arrayResult = new Array();
         var g_timerTip = null;
         var g_nTipStep = 0;
@@ -55,12 +56,12 @@
             g_bCanSlecetRect = false;
             g_arrayResult.length = 0;
 
-            g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 3,10) + 3,6);
+            g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 3, 10) + 3, 6);
             g_nStarMaxCount = g_nStarMinCount;
             var nStarCount = parseInt(Math.random() * (g_nStarMaxCount - g_nStarMinCount + 1) + g_nStarMinCount, 10); //随机生成星星个数
             for (var i = 0; i < nStarCount; ++i) {
                 var nIndex = parseInt(Math.random() * 36 + 1, 10);
-                while(g_arrayResult.indexOf(nIndex) != -1){
+                while (g_arrayResult.indexOf(nIndex) != -1) {
                     nIndex = parseInt(Math.random() * 36 + 1, 10);
                 }
 
@@ -93,7 +94,7 @@
         }
 
         function startTips() {
-            switch (g_nTipStep) {  
+            switch (g_nTipStep) {
                 case 0:
                     $("#tip1").html("其中一些单元格会呈现五角星，");
                     $("#tip2").html("你需要尽量记住单元格上五角星的位置，<br>之后，五角星会消失。");
@@ -137,7 +138,7 @@
                     $("#tippoint4").attr("class", "active");
                     $("#tippoint5").attr("class", "active");
                     $("#tippoint6").attr("class", "");
-                    break;                
+                    break;
                 case 4:
                     $("#tip1").html("请用尽可能快的速度完成作答。");
                     $("#tip2").html("<span class='importantTip'>你即将进入练习环节，熟悉作答方式。<br></span>完成练习后，点击<span class='importantTip'>开始测试</span>按钮进行正式测试。");
@@ -158,12 +159,12 @@
         }
 
         function startGame() {
-            initGameResult();          
+            initGameResult();
             showStars();
-            g_timerGame = setTimeout(function(){
+            g_timerGame = setTimeout(function() {
                 hideStars();
-                g_bCanSlecetRect = true;  
-            },1000);           
+                g_bCanSlecetRect = true;
+            }, 1000);
         }
 
         function stopGame() {
@@ -179,13 +180,13 @@
 
         function checkGameResult() {
             var bResult = true;
-            if(g_nSelectRectCount === g_arrayResult.length) {
-                for(var i = 0;i < g_nSelectRectCount;i++){
+            if (g_nSelectRectCount === g_arrayResult.length) {
+                for (var i = 0; i < g_nSelectRectCount; i++) {
                     var item = document.getElementById('rect' + g_arrayResult[i]);
-                    if(item.state != 1){
+                    if (item.state != 1) {
                         bResult = false;
                         break;
-                    }    
+                    }
                 }
             }
 
@@ -193,30 +194,35 @@
         }
 
         function showResult() {
-            for(var i = 0;i < g_arrayResult.length;i++){
+            for (var i = 0; i < g_arrayResult.length; i++) {
                 var item = document.getElementById('rect' + g_arrayResult[i]);
-                item.style.backgroundImage = 'url(star.png)';   
+                item.style.backgroundImage = 'url(star.png)';
             }
         }
 
         function clickButton() {
-            if(btnOk.innerHTML == "确认选择"){
+            if (btnOk.innerHTML == "确认选择") {
                 var bResult = checkGameResult();
-                if(bResult === true){
+                if (bResult === true) {
                     showResult();
                     btnResultTip.style.color = "#5CB65C";
                     btnResultTip.innerHTML = "恭喜你，答对了！";
-                } else{
+                } else {
                     btnResultTip.style.color = "red";
                     btnResultTip.innerHTML = "很抱歉，答错了！";
                     showResult();
                 }
                 btnOk.innerHTML = "继续测试";
-                g_bCanSlecetRect = false;  
+                g_bCanSlecetRect = false;
+                if (g_nTotalPlayCount === 11) {
+                    alert("测试结束！");
+                    window.location.reload();
+                    return;
+                }
                 g_nTotalPlayCount++;
-            }else{
+            } else {
                 startGame();
-                btnOk.innerHTML = "确认选择";    
+                btnOk.innerHTML = "确认选择";
             }
         }
     </script>
@@ -299,7 +305,7 @@
         showTip();
 
         function onRectClick() {
-            if(g_bCanSlecetRect === false){
+            if (g_bCanSlecetRect === false) {
                 return;
             }
 
@@ -316,12 +322,13 @@
                 g_nSelectRectCount++;
             }
 
-            if(g_nSelectRectCount === g_arrayResult.length) {
+            if (g_nSelectRectCount === g_arrayResult.length) {
                 btnOk.removeAttribute('disabled');
-            } else{
+            } else {
                 btnOk.disabled = 'disabled';
             }
         }
     </script>
 </body>
+
 </html>

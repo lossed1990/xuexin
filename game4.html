@@ -1,6 +1,7 @@
 ﻿<!doctype html>
 
 <html>
+
 <head>
     <title>粗加工练习</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
@@ -22,7 +23,7 @@
             border: 1px solid silver;
             background-color: #8AC4FF;
         }
-              
+        
         .rect {
             width: 30%;
             height: 40%;
@@ -44,30 +45,33 @@
             position: absolute;
             color: white;
         }
-
-        #btnGame4 {          
+        
+        #btnGame4 {
             background-color: #D7BA7D;
         }
     </style>
 
     <script type="text/javascript">
-    //============全局配置信息============
-        var g_arrayResult = ['C','A','C','D','D','B','D','B','D','B','B','D','A','C','B','D','D'];
+        //============全局配置信息============
+        var g_arrayResult = ['C', 'A', 'C', 'D', 'D', 'B', 'D', 'B', 'D', 'B', 'B', 'D', 'A', 'C', 'B', 'D', 'D'];
         var g_timerTip = null;
         var g_nTipStep = 0;
         var g_nQuestionId = 47;
         var m_nCurrentSelect = null;
-        
+
         function selectPic() {
-            if(g_nQuestionId > 51) {
+            if (g_nQuestionId > 51) {
+                alert("测试结束！");
+                window.location.reload();
+                return;
                 g_nQuestionId = 47;
             }
-                
-            rect1.style.backgroundImage = 'url(image/'+ g_nQuestionId +'/1.png)';
-            rectA.style.backgroundImage = 'url(image/'+ g_nQuestionId +'/a.png)';
-            rectB.style.backgroundImage = 'url(image/'+ g_nQuestionId +'/b.png)';
-            rectC.style.backgroundImage = 'url(image/'+ g_nQuestionId +'/c.png)';
-            rectD.style.backgroundImage = 'url(image/'+ g_nQuestionId +'/d.png)';
+
+            rect1.style.backgroundImage = 'url(image/' + g_nQuestionId + '/1.png)';
+            rectA.style.backgroundImage = 'url(image/' + g_nQuestionId + '/a.png)';
+            rectB.style.backgroundImage = 'url(image/' + g_nQuestionId + '/b.png)';
+            rectC.style.backgroundImage = 'url(image/' + g_nQuestionId + '/c.png)';
+            rectD.style.backgroundImage = 'url(image/' + g_nQuestionId + '/d.png)';
         }
 
         function initTips() {
@@ -83,7 +87,7 @@
         }
 
         function startTips() {
-            switch (g_nTipStep) {               
+            switch (g_nTipStep) {
                 case 0:
                     $("#tip1").html("屏幕左面是目标图片，右面是四张对比图片。");
                     $("#tip2").html("");
@@ -123,7 +127,7 @@
                     $("#tippoint3").attr("class", "active");
                     $("#tippoint4").attr("class", "active");
                     $("#tippoint5").attr("class", "active");
-                    break;                
+                    break;
             }
 
             g_nTipStep++;
@@ -134,12 +138,11 @@
         }
 
         function startGame() {
-            initGameResult();          
-            selectPic();          
+            initGameResult();
+            selectPic();
         }
 
-        function stopGame() {
-        }
+        function stopGame() {}
 
         function initGameResult() {
             if (m_nCurrentSelect) {
@@ -161,40 +164,39 @@
         }
 
         function checkGameResult() {
-            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId-47]);
-            if(m_nCurrentSelect === item){
+            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId - 47]);
+            if (m_nCurrentSelect === item) {
                 return true;
             }
-        
+
             return false
         }
 
         function showResult() {
-            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId-47]);
+            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId - 47]);
             item.style.borderColor = 'green';
             item.innerHTML = "正确选项";
         }
 
         function clickButton() {
-            if(btnOk.innerHTML == "确认选择"){
+            if (btnOk.innerHTML == "确认选择") {
                 var bResult = checkGameResult();
-                if(bResult === true){
+                if (bResult === true) {
                     showResult();
                     btnResultTip.style.color = "#5CB65C";
                     btnResultTip.innerHTML = "恭喜你，答对了！";
-                } else{
+                } else {
                     btnResultTip.style.color = "red";
                     btnResultTip.innerHTML = "很抱歉，答错了！";
                     showResult();
                 }
                 btnOk.innerHTML = "继续测试";
-                g_bCanSlecetRect = false;  
+                g_bCanSlecetRect = false;
 
                 g_nQuestionId++;
-            }
-            else{
+            } else {
                 startGame();
-                btnOk.innerHTML = "确认选择";    
+                btnOk.innerHTML = "确认选择";
             }
         }
     </script>
@@ -264,4 +266,5 @@
         }
     </script>
 </body>
+
 </html>

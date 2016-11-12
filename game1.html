@@ -319,6 +319,13 @@
                 }
                 btnOk.innerHTML = "继续测试";
                 g_bCanClickBall = false; 
+                
+                if(g_nTotalPlayCount === 8){
+                    alert("测试结束！");
+                    window.location.reload();      
+                    return;
+                }
+
                 g_nTotalPlayCount++;
             }else{
                 startGame();
