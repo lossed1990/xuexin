@@ -1,0 +1,611 @@
+﻿<!doctype html>
+
+<html>
+
+<head>
+    <title>注意稳定性练习</title>
+    <link rel="stylesheet" type="text/css" href="">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/common.css">
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="js/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/commonfunc.js"></script>
+
+    <style>
+        #divMoveRect {
+            left: 2%;
+            top: 5%;
+            width: 96%;
+            height: 85%;
+            position: absolute;
+            border: 1px solid silver;
+            background-color: #8AC4FF;
+        }
+        
+        /*#divButton {
+            position: absolute;
+            text-align: center;
+        }*/
+        
+          
+        
+       
+        
+        /*#btnResultTip {
+            left: 2%;
+            top: 92%;
+            width: 10%;
+            height: 6%;
+            font-size: 18px;
+        }*/
+
+        #btnGame1 {          
+            background-color: #D7BA7D;
+        }
+        
+        .ball {
+            left: 0px;
+            top: 0px;
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            position: absolute;
+            border-radius: 50%;
+        }
+    </style>
+
+    <script type="text/javascript">
+    //============全局配置信息============
+        //结果集,随机选取的星星
+        var g_arrayResult = new Array();
+        //var g_arrayResult = [0, 1, 2];
+        //Tip相关的定时器和当前步骤值
+        var g_timerTip = null;
+        var g_nTipStep = 0;
+        //其他相关定时器
+        var g_timerMove = null;
+        var g_timerFlash = null;
+        var g_timerGame = null;
+        //小球个数
+        var g_nBallCount = 10;
+        //小球默认（基础）宽度
+        var g_nBallBaseWidth = 70;
+        //当前选择的小球数
+        var g_nSelectBallCount = 0;
+        //是否可以开始选择区域，答题
+        var g_bCanClickBall = false;
+        //游戏完成的次数,用以增加难度
+        var g_nTotalPlayCount = 0;
+        //小球状态枚举
+        var NORMAL = 1;
+        var CLICKED = 2;
+        var STOP = 3;
+        var RESULT = 4;
+        //小球信息
+        var m_arrayBallInfo = new Array();
+        //小球坐标
+        var m_arrayBallPosX = new Array();
+        var m_arrayBallPosY = new Array();
+        //小球当前宽度
+        var m_nBallCurrentWidth;
+        //小球在x,y轴移动的增量 
+        var m_arraydirectX = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        var m_arraydirectY = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        //移动区域范围
+        var baseLeftLine =   [0.0, 0.5, 0.0, 0.5, 0.0, 0.3, 0.0, 0.3, 0.7, 0.2];
+        var baseRightLine =  [0.5, 1.0, 0.5, 1.0, 1.0, 0.7, 0.3, 0.7, 0.7, 0.8];
+        var baseTopLine =    [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.3, 0.7, 0.3, 0.2];
+        var baseButtomLine = [0.5, 0.5, 1.0, 1.0, 1.0, 0.3, 0.7, 1.0, 1.0, 0.8];
+
+        //小球移动区域
+        //var baseLeftLine =   [0.0, 0.5, 0.2, 0.3, 0.6, 0.5, 0.7, 0.1, 0.4, 0.6];
+        //var baseRightLine =  [0.5, 1.0, 0.8, 0.9, 1.0, 0.7, 0.9, 0.9, 0.8, 0.9];
+        //var baseTopLine =    [0.0, 0.0, 0.1, 0.2, 0.6, 0.3, 0.7, 0.2, 0.2, 0.4];
+        //var baseButtomLine = [1.0, 1.0, 0.7, 0.6, 0.9, 0.8, 0.9, 0.7, 0.8, 0.5];
+
+        function checkBallIsSamePos(x,y){
+            for(var i = 0; i<m_arrayBallInfo.length;i++){
+                if(m_arrayBallInfo[i].x === x && m_arrayBallInfo[i].y ===y){
+                    return true;
+                }
+            } 
+
+            return false;
+        }
+
+        function newGame(){
+            //根据区域随机取点
+            m_arrayBallInfo.length = 0;
+            g_arrayResult.length = 0;
+
+            for(var i = 0;i < g_nBallCount; i++){
+                var newBallObject = new Object();
+                newBallObject.x = (Math.random()*(baseRightLine[i] - 0.2 - baseLeftLine[i]) + baseLeftLine[i]).toFixed(1); 
+                newBallObject.y = (Math.random()*(baseButtomLine[i] - 0.2 - baseTopLine[i]) + baseTopLine[i]).toFixed(1); 
+
+                while(checkBallIsSamePos(newBallObject.x,newBallObject.y)) {
+                    newBallObject.x = (Math.random()*(baseRightLine[i] - 0.2 - baseLeftLine[i]) + baseLeftLine[i]).toFixed(1); 
+                    newBallObject.y = (Math.random()*(baseButtomLine[i] - 0.2 - baseTopLine[i]) + baseTopLine[i]).toFixed(1);
+                }
+
+                if(Math.random() > 0.5){
+                    newBallObject.dx = 1;    
+                }else{
+                    newBallObject.dx = -1;   
+                }
+
+                if(Math.random() > 0.5){
+                    newBallObject.dy = 1;    
+                }else{
+                    newBallObject.dy = -1;   
+                }
+
+                console.log("x:" + newBallObject.x + " y:" + newBallObject.y + " dx:" + newBallObject.dx + " dy:" + newBallObject.dy);
+
+                m_arrayBallInfo.push(newBallObject);
+            }
+
+            //随机选择结果集
+            var nResultBallCount = Math.min(parseInt(g_nTotalPlayCount / 5,10) + 3,6);
+            console.log(nResultBallCount);
+            for (var i = 0; i < nResultBallCount; ++i) {
+                var nIndex = parseInt(Math.random() * 10, 10); //随机选取星星
+                while(g_arrayResult.indexOf(nIndex) != -1){
+                    nIndex = parseInt(Math.random() * 10, 10); //以防重复
+                }
+
+                g_arrayResult.push(nIndex);
+            }
+        }
+
+        function startMoveBall() {
+            if (g_timerMove != null) {
+                return;
+            }
+
+            g_timerMove = setInterval("moveAllBall()", 20);
+        }
+
+        function stopMoveBall() {
+            clearInterval(g_timerMove);
+
+            for (var i = 0; i < g_nBallCount; i++) {
+                var item = document.getElementById('ball' + i);
+                setBallState(item, STOP);
+            }
+
+            g_timerMove = null;
+        }
+
+        function startFlashBall() {
+            if (g_timerFlash != null) {
+                return;
+            }
+
+            g_timerFlash = setInterval("flashSomeBall()", 200);
+        }
+
+        function stopFlashBall() {
+            clearInterval(g_timerFlash);
+            showAllFlashBall();
+            g_timerFlash = null;
+        }
+
+        function initTips() {
+            $("#tip1").html("屏幕上会呈现10个圆球。");
+            $("#tip2").html("");
+
+            $("#tippoint1").attr("class", "active");
+            $("#tippoint2").attr("class", "");
+            $("#tippoint3").attr("class", "");
+            $("#tippoint4").attr("class", "");
+            $("#tippoint5").attr("class", "");
+            $("#tippoint6").attr("class", "");
+            $("#tippoint7").attr("class", "");
+        }
+
+        function startTips() {
+            switch (g_nTipStep) {
+                case 0:
+                    $("#tip1").html("其中有3至5个圆球将闪烁。闪烁的圆球即为需要追踪的目标，请记住它们。");
+                    $("#tip2").html("追踪目标闪烁后，10个圆球都会开始运动。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "");
+                    $("#tippoint4").attr("class", "");
+                    $("#tippoint5").attr("class", "");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+
+                    //startFlashBall();
+                    break;
+                case 1:
+                    //stopFlashBall();
+                    //startMoveBall();
+
+                    $("#tip1").html("当圆球运动停止后它们会变为正方形。");
+                    $("#tip2").html("请用鼠标点选出之前闪烁的追踪目标进行作答。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "");
+                    $("#tippoint5").attr("class", "");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 2:
+                    //stopMoveBall();
+
+                    $("#tip1").html("鼠标单击一次即为选中，被选中的目标显示橙色边框；");
+                    $("#tip2").html("再点击一次则取消选择。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 3:
+                    $("#tip1").html("选择的追踪目标的个数必须<span class='importantTip'>等于</span>之前闪烁的圆球数量。");
+                    $("#tip2").html("");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "active");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 4:
+                    $("#tip1").html("完成作答后单击“确定选择”按钮，之后进入下一个任务。");
+                    $("#tip2").html("一旦进入下一个任务，将<span class='importantTip'>无法返回</span>进行修改。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "active");
+                    $("#tippoint6").attr("class", "active");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 5:
+                    $("#tip1").html("请用尽可能快的速度完成作答。");
+                    $("#tip2").html("<span class='importantTip'>你即将进入练习环节，熟悉作答方式。<br></span>完成练习后，点击<span class='importantTip'>开始测试</span>按钮进行正式测试。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "active");
+                    $("#tippoint6").attr("class", "active");
+                    $("#tippoint7").attr("class", "active");
+                    break;
+            }
+
+            g_nTipStep++;
+
+            if (g_nTipStep == 7) {
+                closeTip();
+            }
+        }
+
+        function startGame() {
+            initGameResult();          
+            startFlashBall();
+            g_timerGame = setTimeout(function(){
+                stopFlashBall();
+                startMoveBall();  
+            },1600);    
+
+            g_timerGame = setTimeout(function(){
+                stopMoveBall();
+                g_bCanClickBall = true;  
+            },5000);     
+        }
+
+        function stopGame() {
+            window.clearTimeout(g_timerGame);
+            initGameResult();
+        }
+
+        function initGameResult() {
+            changeBallWidth();
+            InitAllBallPosition();
+            changeSpeed();
+            moveAllBall();
+
+            for (var i = 0; i < g_nBallCount; i++) {
+                var item = document.getElementById('ball' + i);
+                setBallState(item, NORMAL);
+            }
+
+            btnResultTip.innerHTML = "";
+            g_nSelectBallCount = 0;
+            btnOk.disabled = 'disabled';
+            g_bCanClickBall = false;  
+        }
+
+        function checkGameResult() {
+            var bResult = true;
+            if(g_nSelectBallCount === g_arrayResult.length) {
+                for(var i = 0;i < g_nSelectBallCount;i++){
+                    var item = document.getElementById('ball' + g_arrayResult[i]);
+                    if(item.state != CLICKED){
+                        bResult = false;
+                        break;
+                    }    
+                }
+            }
+
+            return bResult;
+        }
+
+        function showResult() {
+            for(var i = 0;i < g_arrayResult.length;i++){
+                var item = document.getElementById('ball' + g_arrayResult[i]); 
+                setBallState(item,RESULT); 
+            }
+        }
+
+        function clickButton() {
+            if(btnOk.innerHTML == "确认选择"){
+                var bResult = checkGameResult();
+                if(bResult === true){
+                    showResult();
+                    btnResultTip.style.color = "#5CB65C";
+                    btnResultTip.innerHTML = "恭喜你，答对了！";
+                } else{
+                    btnResultTip.style.color = "red";
+                    btnResultTip.innerHTML = "很抱歉，答错了！";
+                    showResult();
+                }
+                btnOk.innerHTML = "继续测试";
+                g_bCanClickBall = false; 
+                g_nTotalPlayCount++;
+            }else{
+                startGame();
+                btnOk.innerHTML = "确认选择";    
+            }
+        }
+
+        // function clickButton() {
+
+        //     g_timerTip = setInterval("StartTips()", 5000);
+
+        //     // if (g_timerMove == null) {
+        //     //     startMoveBall();
+        //     //     document.getElementById("btnOk").innerHTML = "停止";
+        //     // } else {
+        //     //     stopMoveBall();
+        //     //     document.getElementById("btnOk").innerHTML = "开始";
+        //     // }
+        // }
+
+        // function clickButton1() {
+        //     if (g_timerFlash == null) {
+        //         startFlashBall();
+        //         document.getElementById("btnOk").innerHTML = "停止";
+        //     } else {
+        //         stopFlashBall();
+        //         document.getElementById("btnOk").innerHTML = "开始";
+        //     }
+        // }
+
+        
+
+        
+    </script>
+</head>
+
+<body>
+    <div id="divMoveRect">
+        <div id="ball0" class="ball" onclick="onBallClick()"></div>
+        <div id="ball1" class="ball" onclick="onBallClick()"></div>
+        <div id="ball2" class="ball" onclick="onBallClick()"></div>
+        <div id="ball3" class="ball" onclick="onBallClick()"></div>
+        <div id="ball4" class="ball" onclick="onBallClick()"></div>
+        <div id="ball5" class="ball" onclick="onBallClick()"></div>
+        <div id="ball6" class="ball" onclick="onBallClick()"></div>
+        <div id="ball7" class="ball" onclick="onBallClick()"></div>
+        <div id="ball8" class="ball" onclick="onBallClick()"></div>
+        <div id="ball9" class="ball" onclick="onBallClick()"></div>
+    </div>
+    <button id="btnGame1" class="btnGame1" type="button" onclick="">注意稳定性练习</button>
+    <button id="btnGame2" class="btnGame2" type="button" onclick="openGame2()">记忆容量练习</button>
+    <button id="btnGame3" class="btnGame3" type="button" onclick="openGame3()">粗加工练习</button>
+    <button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>
+    <!--<button id="btnTest" class="btnTest" type="button" onclick="openTest()">综合测验</button>-->
+
+    <button id="btnResultTip" class="btnResultTip" type="button"></button>
+    <button id="btnOk" class="btnOk" type="button" onclick="clickButton()">开始测试</button>
+    <button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button>
+    <div id="divTip">
+        <div class="panel panel-primary mypanel">
+            <div class="panel-heading">
+                <h3 class="panel-title center">答题说明</h3>
+                <button type="button" class="close tipclosebtn" onclick="closeTip()">&times;</button>
+            </div>
+            <div class="panel-body mypanelbody">
+                <p id="tip1">屏幕上会呈现10个圆球。</p>
+                <p id="tip2"></p>
+                <ol class="carousel-indicators iter">
+                    <li id="tippoint1" class="active" data-slide-to="0"></li>
+                    <li id="tippoint2" data-slide-to="1"></li>
+                    <li id="tippoint3" data-slide-to="2"></li>
+                    <li id="tippoint4" data-slide-to="3"></li>
+                    <li id="tippoint5" data-slide-to="4"></li>
+                    <li id="tippoint6" data-slide-to="5"></li>
+                    <li id="tippoint7" data-slide-to="6"></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        window.onresize = function() {
+            changeBallWidth();
+            InitAllBallPosition();
+            changeSpeed();
+        }
+
+        showTip();
+        changeBallWidth();
+        InitAllBallPosition();
+        changeSpeed();
+        moveAllBall();
+
+        //初始化所有球的位置   
+        function InitAllBallPosition() {
+            newGame();
+            for(var i = 0; i < m_arrayBallInfo.length; i++) {
+                m_arrayBallPosX[i] = divMoveRect.offsetWidth * m_arrayBallInfo[i].x;
+                m_arrayBallPosY[i] = divMoveRect.offsetHeight * m_arrayBallInfo[i].y;
+            }
+            // for (var i = 0; i < baseLeftLine.length; i++) {
+            //     m_arrayBallPosX[i] = divMoveRect.offsetWidth * baseLeftLine[i];
+            // }
+
+            // for (var j = 0; j < baseTopLine.length; j++) {
+            //     m_arrayBallPosY[j] = divMoveRect.offsetHeight * baseTopLine[j];
+            // }
+        }
+
+        //更新小球大小
+        function changeBallWidth() {
+            m_nBallCurrentWidth = (g_nBallBaseWidth * Math.min(divMoveRect.offsetWidth, divMoveRect.offsetHeight)) / 800.0;
+        }
+
+        //更新移动速度 
+        function changeSpeed() {
+            for (var i = 0; i < g_nBallCount; i++) {
+                m_arraydirectX[i] = divMoveRect.offsetWidth / 800.0;
+                m_arraydirectY[i] = divMoveRect.offsetHeight / 800.0;
+            }
+        }
+
+        //移动某个小球
+        function moveSignleBall(id, index, bMove) {
+            m_arrayBallPosX[index] += 2 * m_arraydirectX[index];
+            m_arrayBallPosY[index] += 2 * m_arraydirectY[index];
+
+            if (bMove) {
+                var item = document.getElementById(id);
+                item.style.top = m_arrayBallPosY[index] + 'px';
+                item.style.left = m_arrayBallPosX[index] + 'px';
+                item.style.width = m_nBallCurrentWidth + 'px';
+                item.style.height = m_nBallCurrentWidth + 'px';
+            }
+
+            if (m_arrayBallPosX[index] + m_nBallCurrentWidth >= divMoveRect.offsetWidth * baseRightLine[index] || m_arrayBallPosX[index] <= divMoveRect.offsetWidth * baseLeftLine[index]) {
+                m_arraydirectX[index] = -m_arraydirectX[index];
+            }
+            if (m_arrayBallPosY[index] + m_nBallCurrentWidth >= divMoveRect.offsetHeight * baseButtomLine[index] || m_arrayBallPosY[index] <= divMoveRect.offsetHeight * baseTopLine[index]) {
+                m_arraydirectY[index] = -m_arraydirectY[index];
+            }
+        }
+
+        function moveAllBall() {
+            for (var i = 0; i < g_nBallCount; i++) {
+                moveSignleBall('ball' + i, i, true);
+            }
+        }
+
+        function flashSomeBall() {
+            for (var i = 0; i < g_arrayResult.length; i++) {
+
+                var item = document.getElementById('ball' + g_arrayResult[i]);
+
+                if (item.style.visibility == 'visible') {
+                    item.style.visibility = 'hidden';
+                } else {
+                    item.style.visibility = 'visible';
+                }
+            }
+        }
+
+        function showAllFlashBall() {
+            for (var i = 0; i < g_arrayResult.length; i++) {
+                var item = document.getElementById('ball' + g_arrayResult[i]);
+                if (item.style.visibility != 'visible') {
+                    item.style.visibility = 'visible';
+                }
+            }
+        }
+
+        function setBallState(eBall, nState) {
+            switch (nState) {
+                case NORMAL:
+                    eBall.style.borderRadius = '50%';
+                    eBall.style.borderColor = 'white';
+                    eBall.style.borderWidth = '0px';
+                    eBall.style.borderStyle = 'solid';
+                    break;
+
+                case CLICKED:
+                    eBall.style.borderRadius = '0%';
+                    eBall.style.borderColor = 'yellow';
+                    eBall.style.borderWidth = '3px';
+                    eBall.style.borderStyle = 'solid';
+                    break;
+
+                case STOP:
+                    eBall.style.borderRadius = '0%';
+                    eBall.style.borderColor = 'white';
+                    eBall.style.borderWidth = '0px';
+                    eBall.style.borderStyle = 'solid';
+                    break;
+
+                case RESULT:
+                    eBall.style.borderRadius = '0%';
+                    eBall.style.borderColor = 'green';
+                    eBall.style.borderWidth = '3px';
+                    eBall.style.borderStyle = 'solid';
+                    break;
+            }
+
+            eBall.state = nState;
+        }
+
+        function onBallClick() {
+            if(g_bCanClickBall === false){
+                return;
+            }
+
+            if (event.target.state === STOP) {
+                setBallState(event.target, CLICKED);
+                g_nSelectBallCount++;
+            } else if (event.target.state === CLICKED) {
+                setBallState(event.target, STOP);
+                g_nSelectBallCount--;
+            }
+
+            if(g_nSelectBallCount === g_arrayResult.length) {
+                btnOk.removeAttribute('disabled');
+            } else{
+                btnOk.disabled = 'disabled';
+            }
+        }
+
+        // function BeforeGame() {
+        //     window.location.href = "game3.html";
+        // }
+
+        // function NextGame() {
+        //     window.location.href = "game2.html";
+        // }
+    </script>
+</body>
+
+</html>
