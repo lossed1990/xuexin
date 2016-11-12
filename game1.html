@@ -107,7 +107,7 @@
                 m_arrayBallInfo.push(newBallObject);
             }
 
-            var nResultBallCount = Math.min(parseInt(g_nTotalPlayCount / 15,10) + 3,6);
+            var nResultBallCount = Math.min(parseInt(g_nTotalPlayCount / 3,10) + 3,5);
             for (var i = 0; i < nResultBallCount; ++i) {
                 var nIndex = parseInt(Math.random() * 10, 10); 
                 while(g_arrayResult.indexOf(nIndex) != -1){

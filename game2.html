@@ -3,17 +3,12 @@
 <html>
 <head>
     <title>记忆容量练习</title>
-    <link rel="stylesheet" type="text/css" href="">
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
 
-    <!-- 新 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/common.css">
 
-    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
     <script src="js/jquery.min.js"></script>
-
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/commonfunc.js"></script>
 
@@ -45,21 +40,14 @@
 
     <script type="text/javascript">
     //============全局配置信息============
-        //结果集,随机选取的星星
         var g_arrayResult = new Array();
-        //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
-        //星星显示时间的定时器
         var g_timerGame = null;
-        //当前选择的星星数
         var g_nSelectRectCount = 0;
-        //是否可以开始选择区域，答题
         var g_bCanSlecetRect = false;
-        //随机星星个数
         var g_nStarMinCount = 3;
         var g_nStarMaxCount = 9;
-        //游戏完成的次数,用以增加难度
         var g_nTotalPlayCount = 0;
 
         function showStars() {
@@ -67,13 +55,13 @@
             g_bCanSlecetRect = false;
             g_arrayResult.length = 0;
 
-            g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 5,10) + 3,9);
+            g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 3,10) + 3,6);
             g_nStarMaxCount = g_nStarMinCount;
             var nStarCount = parseInt(Math.random() * (g_nStarMaxCount - g_nStarMinCount + 1) + g_nStarMinCount, 10); //随机生成星星个数
             for (var i = 0; i < nStarCount; ++i) {
-                var nIndex = parseInt(Math.random() * 36 + 1, 10); //随机选取星星
+                var nIndex = parseInt(Math.random() * 36 + 1, 10);
                 while(g_arrayResult.indexOf(nIndex) != -1){
-                    nIndex = parseInt(Math.random() * 36 + 1, 10); //以防重复
+                    nIndex = parseInt(Math.random() * 36 + 1, 10);
                 }
 
                 var item = document.getElementById('rect' + nIndex);
@@ -282,7 +270,6 @@
     <button id="btnGame2" class="btnGame2" type="button" onclick="">记忆容量练习</button>
     <button id="btnGame3" class="btnGame3" type="button" onclick="openGame3()">粗加工练习</button>
     <button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>
-    <!--<button id="btnTest" class="btnTest" type="button" onclick="openTest()">综合测验</button>-->
 
     <button id="btnResultTip" class="btnResultTip" type="button"></button>
     <button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button>
