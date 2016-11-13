@@ -52,14 +52,25 @@
     </style>
 
     <script type="text/javascript">
-        //============全局配置信息============
-        var g_arrayResult = ['A', 'D', 'C', 'C', 'D', 'D', 'C', 'A', 'D', 'A', 'C', 'B', 'D', 'C', 'B', 'A', 'A', 'A', 'C', 'D', 'C', 'C', 'D', 'D', 'C', 'C', 'D', 'C', 'C', 'D', 'C', 'A', 'A', 'C', 'B', 'B', 'C', 'D', 'C', 'A', 'C', 'B', 'A', 'D'];
+    //============全局配置信息============
+        //结果集
+        var g_arrayResult = ['A','D','C','C','D','D','C','A','D','A','C','B','D','C','B','A','A','A','C','D','C','C','D','D','C','C','D','C','C','D','C','A','A','D','B','B','C','D','C','A','C','B','A','D'];
+        //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
+        //选取的题目编号
         var g_nQuestionId = 1;
+        //当前选择项
         var m_nCurrentSelect = null;
 
         function selectPic() {
+		    //练习版
+			/*
+			if(g_nQuestionId > 46) {
+                g_nQuestionId = 1;
+            }
+			*/
+		    //测试版
             if (g_nQuestionId > 10) {
                 alert("测试结束！");
                 window.location.reload();

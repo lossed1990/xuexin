@@ -40,30 +40,41 @@
 
     <script type="text/javascript">
     //============全局配置信息============
+        //结果集,随机选取的星星
         var g_arrayResult = new Array();
+        //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
+        //其他相关定时器
         var g_timerMove = null;
         var g_timerFlash = null;
         var g_timerGame = null;
-
+        //小球个数
         var g_nBallCount = 10;
+        //小球默认（基础）宽度
         var g_nBallBaseWidth = 70;
+        //当前选择的小球数
         var g_nSelectBallCount = 0;
+        //是否可以开始选择区域，答题
         var g_bCanClickBall = false;
+        //游戏完成的次数,用以增加难度
         var g_nTotalPlayCount = 0;
-
+        //小球状态枚举
         var NORMAL = 1;
         var CLICKED = 2;
         var STOP = 3;
         var RESULT = 4;
-
+        //小球信息
         var m_arrayBallInfo = new Array();
+        //小球坐标
         var m_arrayBallPosX = new Array();
         var m_arrayBallPosY = new Array();
+        //小球当前宽度
         var m_nBallCurrentWidth;
+        //小球在x,y轴移动的增量 
         var m_arraydirectX = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
         var m_arraydirectY = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        //移动区域范围
         var baseLeftLine =   [0.0, 0.5, 0.0, 0.5, 0.0, 0.3, 0.0, 0.3, 0.7, 0.2];
         var baseRightLine =  [0.5, 1.0, 0.5, 1.0, 1.0, 0.7, 0.3, 0.7, 0.7, 0.8];
         var baseTopLine =    [0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.3, 0.7, 0.3, 0.2];
@@ -80,6 +91,7 @@
         }
 
         function newGame(){
+            //根据区域随机取点
             m_arrayBallInfo.length = 0;
             g_arrayResult.length = 0;
 
@@ -107,11 +119,15 @@
                 m_arrayBallInfo.push(newBallObject);
             }
 
+            //随机选择结果集
+		    //练习版
+			//var nResultBallCount = Math.min(parseInt(g_nTotalPlayCount / 5,10) + 3,6);
+			//测试版	
             var nResultBallCount = Math.min(parseInt(g_nTotalPlayCount / 3,10) + 3,5);
             for (var i = 0; i < nResultBallCount; ++i) {
-                var nIndex = parseInt(Math.random() * 10, 10); 
+                var nIndex = parseInt(Math.random() * 10, 10); //随机选取星星
                 while(g_arrayResult.indexOf(nIndex) != -1){
-                    nIndex = parseInt(Math.random() * 10, 10);
+                    nIndex = parseInt(Math.random() * 10, 10); //以防重复
                 }
 
                 g_arrayResult.push(nIndex);
@@ -391,6 +407,7 @@
         changeSpeed();
         moveAllBall();
 
+        //初始化所有球的位置   
         function InitAllBallPosition() {
             newGame();
             for(var i = 0; i < m_arrayBallInfo.length; i++) {
@@ -399,10 +416,12 @@
             }
         }
 
+        //更新小球大小
         function changeBallWidth() {
             m_nBallCurrentWidth = (g_nBallBaseWidth * Math.min(divMoveRect.offsetWidth, divMoveRect.offsetHeight)) / 800.0;
         }
 
+        //更新移动速度 
         function changeSpeed() {
             for (var i = 0; i < g_nBallCount; i++) {
                 m_arraydirectX[i] = divMoveRect.offsetWidth / 800.0;
@@ -410,6 +429,7 @@
             }
         }
 
+        //移动某个小球
         function moveSignleBall(id, index, bMove) {
             m_arrayBallPosX[index] += 2 * m_arraydirectX[index];
             m_arrayBallPosY[index] += 2 * m_arraydirectY[index];

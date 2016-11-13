@@ -1,7 +1,6 @@
 ﻿<!doctype html>
 
 <html>
-
 <head>
     <title>记忆容量练习</title>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
@@ -40,29 +39,38 @@
     </style>
 
     <script type="text/javascript">
-        //============全局配置信息============
+    //============全局配置信息============
+        //结果集,随机选取的星星
         var g_arrayResult = new Array();
+        //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
+        //星星显示时间的定时器
         var g_timerGame = null;
+        //当前选择的星星数
         var g_nSelectRectCount = 0;
+        //是否可以开始选择区域，答题
         var g_bCanSlecetRect = false;
+        //随机星星个数
         var g_nStarMinCount = 3;
         var g_nStarMaxCount = 9;
+        //游戏完成的次数,用以增加难度
         var g_nTotalPlayCount = 0;
 
         function showStars() {
             btnOk.disabled = 'disabled';
             g_bCanSlecetRect = false;
             g_arrayResult.length = 0;
-
+            //练习版
+			//g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 5,10) + 3,9);
+            //测试版
             g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 3, 10) + 3, 6);
             g_nStarMaxCount = g_nStarMinCount;
             var nStarCount = parseInt(Math.random() * (g_nStarMaxCount - g_nStarMinCount + 1) + g_nStarMinCount, 10); //随机生成星星个数
             for (var i = 0; i < nStarCount; ++i) {
-                var nIndex = parseInt(Math.random() * 36 + 1, 10);
-                while (g_arrayResult.indexOf(nIndex) != -1) {
-                    nIndex = parseInt(Math.random() * 36 + 1, 10);
+                var nIndex = parseInt(Math.random() * 36 + 1, 10); //随机选取星星
+                while(g_arrayResult.indexOf(nIndex) != -1){
+                    nIndex = parseInt(Math.random() * 36 + 1, 10); //以防重复
                 }
 
                 var item = document.getElementById('rect' + nIndex);
@@ -94,7 +102,7 @@
         }
 
         function startTips() {
-            switch (g_nTipStep) {
+            switch (g_nTipStep) {  
                 case 0:
                     $("#tip1").html("其中一些单元格会呈现五角星，");
                     $("#tip2").html("你需要尽量记住单元格上五角星的位置，<br>之后，五角星会消失。");
@@ -138,7 +146,7 @@
                     $("#tippoint4").attr("class", "active");
                     $("#tippoint5").attr("class", "active");
                     $("#tippoint6").attr("class", "");
-                    break;
+                    break;                
                 case 4:
                     $("#tip1").html("请用尽可能快的速度完成作答。");
                     $("#tip2").html("<span class='importantTip'>你即将进入练习环节，熟悉作答方式。<br></span>完成练习后，点击<span class='importantTip'>开始测试</span>按钮进行正式测试。");

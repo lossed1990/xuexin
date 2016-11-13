@@ -52,14 +52,24 @@
     </style>
 
     <script type="text/javascript">
-        //============全局配置信息============
-        var g_arrayResult = ['C', 'A', 'C', 'D', 'D', 'B', 'D', 'B', 'D', 'B', 'B', 'D', 'A', 'C', 'B', 'D', 'D'];
+    //============全局配置信息============
+        //结果集
+        var g_arrayResult = ['C','A','C','D','D','B','D','B','D','A','B','D','A','C','C','D','D']; //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
+        //选取的题目编号
         var g_nQuestionId = 47;
+        //当前选择项
         var m_nCurrentSelect = null;
 
         function selectPic() {
+            //g_nQuestionId = parseInt(Math.random() * 46 + 1, 10);
+			//练习版
+			/*
+			if(g_nQuestionId > 63) {
+                g_nQuestionId = 47;
+            }
+			*/
             if (g_nQuestionId > 51) {
                 alert("测试结束！");
                 window.location.reload();
