@@ -64,7 +64,7 @@
         var g_timerTip = null;
         var g_nTipStep = 0;
         //选取的题目编号
-        var g_nQuestionId = 47;
+        var g_nQuestionId = 1;
         //当前选择项
         var m_nCurrentSelect = null;
 
@@ -72,22 +72,22 @@
             //g_nQuestionId = parseInt(Math.random() * 46 + 1, 10);
 			//练习版
 			/*
-			if(g_nQuestionId > 63) {
-                g_nQuestionId = 47;
+			if(g_nQuestionId > 33) {
+                g_nQuestionId = 1;
             }
 			*/
-            if (g_nQuestionId > 51) {
+            if (g_nQuestionId > 5) {
                 alert("测试结束！");
                 window.location.reload();
                 return;
-                g_nQuestionId = 47;
+                g_nQuestionId = 1;
             }
 
-            rect1.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/1.png)';
-            rectA.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/a.png)';
-            rectB.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/b.png)';
-            rectC.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/c.png)';
-            rectD.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/d.png)';
+            rect1.style.backgroundImage = 'url(image/xi/' + g_nQuestionId + '/1.png)';
+            rectA.style.backgroundImage = 'url(image/xi/' + g_nQuestionId + '/a.png)';
+            rectB.style.backgroundImage = 'url(image/xi/' + g_nQuestionId + '/b.png)';
+            rectC.style.backgroundImage = 'url(image/xi/' + g_nQuestionId + '/c.png)';
+            rectD.style.backgroundImage = 'url(image/xi/' + g_nQuestionId + '/d.png)';
         }
 
         function initTips() {
@@ -180,7 +180,7 @@
         }
 
         function checkGameResult() {
-            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId - 47]);
+            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId - 1]);
             if (m_nCurrentSelect === item) {
                 return true;
             }
@@ -189,7 +189,7 @@
         }
 
         function showResult() {
-            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId - 47]);
+            var item = document.getElementById('rect' + g_arrayResult[g_nQuestionId - 1]);
             item.style.borderColor = 'green';
             item.innerHTML = "正确选项";
         }
@@ -220,11 +220,11 @@
 
 <body>
     <div id="divRect">
-        <div id="rect1" class="rect" style="left:2%;top:30%;background-image: url(image/47/1.png);">目标图片</div>
-        <div id="rectA" class="rect" style="left:35%;top:9%;background-image: url(image/47/a.png);" onclick="onRectClick()">对比图片A</div>
-        <div id="rectB" class="rect" style="left:35%;top:51%;background-image: url(image/47/b.png);" onclick="onRectClick()">对比图片B</div>
-        <div id="rectC" class="rect" style="left:68%;top:9%;background-image: url(image/47/c.png);" onclick="onRectClick()">对比图片C</div>
-        <div id="rectD" class="rect" style="left:68%;top:51%;background-image: url(image/47/d.png);" onclick="onRectClick()">对比图片D</div>
+        <div id="rect1" class="rect" style="left:2%;top:30%;background-image: url(image/xi/1/1.png);">目标图片</div>
+        <div id="rectA" class="rect" style="left:35%;top:9%;background-image: url(image/xi/1/a.png);" onclick="onRectClick()">对比图片A</div>
+        <div id="rectB" class="rect" style="left:35%;top:51%;background-image: url(image/xi/1/b.png);" onclick="onRectClick()">对比图片B</div>
+        <div id="rectC" class="rect" style="left:68%;top:9%;background-image: url(image/xi/1/c.png);" onclick="onRectClick()">对比图片C</div>
+        <div id="rectD" class="rect" style="left:68%;top:51%;background-image: url(image/xi/1/d.png);" onclick="onRectClick()">对比图片D</div>
 
         <div class="number" style="left:33%;top:9%;">A</div>
         <div class="number" style="left:33%;top:51%;">B</div>
