@@ -54,7 +54,13 @@
     <script type="text/javascript">
     //============全局配置信息============
         //结果集
-        var g_arrayResult = ['C','A','C','D','D','B','D','B','D','A','B','D','A','C','C','D','D']; //Tip相关的定时器和当前步骤值
+        var g_arrayResult = ['C','A','C','D','D',
+                             'B','D','B','D','A',
+                             'B','D','A','C','C',
+                             'D','D','C','D','B',
+                             'B','D','D','C','B',
+                             'D','C','B','D','D',
+                             'D','D','B']; //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
         //选取的题目编号
@@ -77,11 +83,11 @@
                 g_nQuestionId = 47;
             }
 
-            rect1.style.backgroundImage = 'url(image/' + g_nQuestionId + '/1.png)';
-            rectA.style.backgroundImage = 'url(image/' + g_nQuestionId + '/a.png)';
-            rectB.style.backgroundImage = 'url(image/' + g_nQuestionId + '/b.png)';
-            rectC.style.backgroundImage = 'url(image/' + g_nQuestionId + '/c.png)';
-            rectD.style.backgroundImage = 'url(image/' + g_nQuestionId + '/d.png)';
+            rect1.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/1.png)';
+            rectA.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/a.png)';
+            rectB.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/b.png)';
+            rectC.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/c.png)';
+            rectD.style.backgroundImage = 'url(image/' + g_nQuestionId + '/xi/d.png)';
         }
 
         function initTips() {
