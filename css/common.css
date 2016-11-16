@@ -26,6 +26,10 @@ button:disabled {
     color: #5CB65C;
 }
 
+.btnResultTip:hover {
+    background-color: white;
+}
+
 .btnGame1 {
     left: 2%;
     top: 0%;

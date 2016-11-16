@@ -21,17 +21,23 @@
             height: 85%;
             position: absolute;
             border: 1px solid silver;
-            background-color: #8AC4FF;
+            background-color: white;
         }
         
         .rect {
             width: 16%;
             height: 16%;
-            background-color: white;
+            background-color: #8AC4FF;//white;
             background-repeat: no-repeat;
             background-position: center;
             position: absolute;
-            border: 2px solid silver;
+            border: 2px solid white;//;silver;
+            border-radius: 15px;
+            line-height:100%;
+            text-align:center;
+            font-size:100%;   
+            //display:table;
+          //  margin:0 auto; 
         }
         
         #btnGame2 {
@@ -41,18 +47,19 @@
 
     <script type="text/javascript">
         //============全局配置信息============
-        //结果集,随机选取的星星
+        //结果集,随机选取的数字
         var g_arrayResult = new Array();
+        var g_arraySelect = new Array();
         //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
-        //星星显示时间的定时器
+        //数字显示时间的定时器
         var g_timerGame = null;
-        //当前选择的星星数
+        //当前选择的数字数
         var g_nSelectRectCount = 0;
         //是否可以开始选择区域，答题
         var g_bCanSlecetRect = false;
-        //随机星星个数
+        //随机数字个数
         var g_nStarMinCount = 3;
         var g_nStarMaxCount = 9;
         //游戏完成的次数,用以增加难度
@@ -67,15 +74,16 @@
             //测试版
             g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 3, 10) + 3, 6);
             g_nStarMaxCount = g_nStarMinCount;
-            var nStarCount = parseInt(Math.random() * (g_nStarMaxCount - g_nStarMinCount + 1) + g_nStarMinCount, 10); //随机生成星星个数
+            var nStarCount = parseInt(Math.random() * (g_nStarMaxCount - g_nStarMinCount + 1) + g_nStarMinCount, 10); //随机生成数字个数
             for (var i = 0; i < nStarCount; ++i) {
-                var nIndex = parseInt(Math.random() * 36 + 1, 10); //随机选取星星
+                var nIndex = parseInt(Math.random() * 36 + 1, 10); //随机选取数字
                 while (g_arrayResult.indexOf(nIndex) != -1) {
                     nIndex = parseInt(Math.random() * 36 + 1, 10); //以防重复
                 }
 
                 var item = document.getElementById('rect' + nIndex);
-                item.style.backgroundImage = 'url(star.png)';
+                item.style.backgroundColor = 'green'
+                item.style.backgroundImage = 'url(image/number/' + (i+1) + '.png)';
 
                 g_arrayResult.push(nIndex);
             }
@@ -85,8 +93,9 @@
             for (var i = 1; i <= 36; ++i) {
                 var item = document.getElementById('rect' + i);
                 item.style.backgroundImage = '';
-                item.style.backgroundColor = 'white';
+                item.style.backgroundColor = '#8AC4FF';// 'white';
                 item.state = 0;
+                item.index = i;
             }
         }
 
@@ -185,14 +194,14 @@
             hideStars();
             g_nSelectRectCount = 0;
             btnResultTip.innerHTML = "";
+            g_arraySelect.length = 0; 
         }
 
         function checkGameResult() {
             var bResult = true;
             if (g_nSelectRectCount === g_arrayResult.length) {
                 for (var i = 0; i < g_nSelectRectCount; i++) {
-                    var item = document.getElementById('rect' + g_arrayResult[i]);
-                    if (item.state != 1) {
+                    if (g_arraySelect[i] != g_arrayResult[i]) {
                         bResult = false;
                         break;
                     }
@@ -205,8 +214,21 @@
         function showResult() {
             for (var i = 0; i < g_arrayResult.length; i++) {
                 var item = document.getElementById('rect' + g_arrayResult[i]);
-                item.style.backgroundImage = 'url(star.png)';
+                item.style.backgroundImage = 'url(image/number/' + (i+1) + '.png)';
+
+                if(g_arrayResult[i] != g_arraySelect[i]){
+                    item.style.backgroundColor = '#D7BA7D';
+                }else{
+                    item.style.backgroundColor = 'green';
+                }         
             }
+        }
+
+        function clearSelect() {
+             if (btnResultTip.innerHTML == "重新选择") {           
+                initGameResult();
+                btnOk.disabled = 'disabled';
+            } 
         }
 
         function clickButton() {
@@ -286,7 +308,7 @@
     <button id="btnGame3" class="btnGame3" type="button" onclick="openGame3()">粗加工练习</button>
     <button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>
 
-    <button id="btnResultTip" class="btnResultTip" type="button"></button>
+    <button id="btnResultTip" class="btnResultTip" type="button" onclick="clearSelect()"></button>
     <button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button>
     <button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button>
     <div id="divTip">
@@ -318,17 +340,32 @@
                 return;
             }
 
+            if (g_nSelectRectCount >= g_arrayResult.length) {
+                return;
+            }
+
             if (event.target.state === 1) {
 
-                event.target.style.backgroundColor = 'white';
-                event.target.state = 0;
-                g_nSelectRectCount--;
+                // event.target.style.backgroundColor = '#8AC4FF';//'white';
+                // event.target.state = 0;
+                // g_nSelectRectCount--;
+                // event.target.style.backgroundImage = '';
 
             } else {
-                event.target.style.backgroundColor = '#8AC4FF';
+                event.target.style.backgroundColor = 'green';//'#8AC4FF';
 
                 event.target.state = 1;
                 g_nSelectRectCount++;
+
+                if(g_nSelectRectCount <= g_arrayResult.length){
+                    event.target.style.backgroundImage = 'url(image/number/' + g_nSelectRectCount + '.png)';  
+
+                    // var object = new Object();
+                    // object.index = event.target.index;
+                    // object.number = g_nSelectRectCount;
+
+                    g_arraySelect.push(event.target.index);  
+                }
             }
 
             if (g_nSelectRectCount === g_arrayResult.length) {
@@ -336,6 +373,9 @@
             } else {
                 btnOk.disabled = 'disabled';
             }
+
+            btnResultTip.style.color = "#8AC4FF";
+            btnResultTip.innerHTML = "重新选择";
         }
     </script>
 </body>
