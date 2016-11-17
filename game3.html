@@ -36,6 +36,7 @@
             color: green;
             font-size: 16px;
             font-weight: bolder;
+            background-size: 100% 100%;
         }
         
         .number {
@@ -54,17 +55,19 @@
     <script type="text/javascript">
     //============全局配置信息============
         //结果集
-        var g_arrayResult = ['A','D','C','C','D',
-                             'D','C','A','D','A',
-                             'C','B','D','C','B',
-                             'A','A','A','C','D',
-                             'C','C','D','D','C',
-                             'C','D','C','C','D',
-                             'C','A','A','D','B',
-                             'B','C','D','C','A',
-                             'C','B','A','D','C',
-                             'C','A','A','C','A',
-                             'A','D','C','A'];
+        var g_arrayResult = [
+		    'A', 'D', 'C', 'C', 'D',
+            'D', 'C', 'A', 'D', 'A',
+            'C', 'B', 'D', 'C', 'B',
+            'A', 'A', 'A', 'C', 'D',
+            'C', 'C', 'D', 'D', 'C',
+            'C', 'D', 'C', 'C', 'D',
+            'C', 'A', 'A', 'D', 'B',
+            'B', 'C', 'D', 'C', 'A',
+            'C', 'B', 'A', 'D', 'C',
+            'C', 'A', 'A', 'C', 'A',
+            'A', 'D', 'C', 'A'
+        ];
         //Tip相关的定时器和当前步骤值
         var g_timerTip = null;
         var g_nTipStep = 0;
@@ -74,13 +77,13 @@
         var m_nCurrentSelect = null;
 
         function selectPic() {
-		    //练习版
-			/*
+            //练习版
+            /*
 			if(g_nQuestionId > 54) {
                 g_nQuestionId = 1;
             }
 			*/
-		    //测试版
+            //测试版
             if (g_nQuestionId > 10) {
                 alert("测试结束！");
                 window.location.reload();
