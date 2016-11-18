@@ -87,6 +87,17 @@
         var g_BaloonCounter = 5;        //倒计时开始
         var g_BaloonTimeout;            //倒计时器
 
+        var g_resultBallonOK = 0;
+        var g_resultBallonFail = 0;
+        var g_resultCaclOK = 0;
+        var g_resultCaclFail = 0;
+        var g_resultCompareOK = 0;
+        var g_resultCompareFail = 0;
+
+        var g_IsBlue = false;
+        var g_IsCaclRight = false;
+        var g_IsStringSame = false;
+
         function initTips() {
             $("#tip1").html("屏幕上将同时显示3个任务，请尽可能快速准确的同时处理三个区域中显示的任务");
             $("#tip2").html("");
@@ -154,6 +165,10 @@
         }
         
         function readyForNextGame() {
+            showResult();
+
+            $("#tdBalloonTitle").html("测试结束<br/><br/><span style='color: limegreen'> 绿色</span>表示项目答对数目<br/><span style='color: red'> 红色</span>表示项目答错数目");
+
             $("#btnOk").removeAttr("disabled");
             $("#btnOk").html("继续测试");
             $("#btnOk").click(function () {
@@ -170,6 +185,9 @@
         }
 
         function showResult() {
+            $("#btnResultTip").html("气球颜色:<span style='color: limegreen'>" + g_resultBallonOK + "</span>/<span style='color: red'>" + g_resultBallonFail
+            + "</span>&nbsp;公式计算:<span style='color: limegreen;'>" + g_resultCaclOK + "</span>/<span style='color: red' >" + g_resultCaclFail
+                + "</span>&nbsp;字符比较:<span style='color: limegreen'>" + g_resultCompareOK + "</span>/<span style='color: red'>" + g_resultCompareFail + "</span> ");
         }
 
         //倒计时，到达时间后切换
@@ -192,8 +210,10 @@
             var strColor = "";
             if (Math.random() > 0.5) {
                 strColor = "red";
+                g_IsBlue = false;
             } else {
                 strColor = "blue";
+                g_IsBlue = true;
             }
 
             //替换气球图片
@@ -258,8 +278,17 @@
             dispResult += "=";
             if (Math.random() > 0.5) {
                 dispResult += calResutl.toFixed(0);
+                g_IsCaclRight = true;
             } else {
-                dispResult += (calResutl * Math.random()).toFixed(0);
+                var randamResult = (calResutl * Math.random()).toFixed(0);
+                dispResult += randamResult;
+
+                //随机可能还是相同
+                if(randamResult != calResutl.toFixed(0)) {
+                    g_IsCaclRight = false;
+                } else {
+                    g_IsCaclRight = true;
+                }
             }
 
             $("#divCalcResult").html(dispResult);
@@ -282,6 +311,7 @@
             var strRight = "";
             if (Math.random() > 0.6) {
                 strRight = strLeft;
+                g_IsStringSame = true;
             } else {
                 //随机替换一些字符
                 for (var i = 0; i < 5; i++) {
@@ -290,6 +320,13 @@
                     } else {
                         strRight += String.fromCharCode(Math.floor(Math.random() * 26) + "A".charCodeAt(0));
                     }
+                }
+
+                //随机结果可能相同
+                if(strLeft != strRight) {
+                    g_IsStringSame = false;
+                } else {
+                    g_IsStringSame = true;
                 }
             }
 
@@ -305,6 +342,14 @@
         $(function () {
             //绑定数字比较点击按钮
             $("button[id^='btnNumberCompare']").click(function () {
+                //检查用户输入结果
+                if((this.id == "btnNumberCompareSame" && g_IsStringSame)
+                    || (this.id == "btnNumberCompareDiff" && !g_IsStringSame)) {
+                    g_resultCompareOK++;
+                } else {
+                    g_resultCompareFail++;
+                }
+
                 //模拟
                 $("button[id^='btnNumberCompare']").css("background-color", "gray");
                 $("#divnumberleft").html("");
@@ -320,6 +365,14 @@
 
             //绑定竖式计算按钮
             $("button[id^='btnCalcDigital']").click(function () {
+                //检查用户输入结果
+                if((this.id == "btnCalcDigitalOK" && g_IsCaclRight)
+                    || (this.id == "btnCalcDigitalBad" && !g_IsCaclRight)) {
+                    g_resultCaclOK++;
+                } else {
+                    g_resultCaclFail++;
+                }
+
                 //模拟
                 $("button[id^='btnCalcDigital']").css("background-color", "gray");
                 $("#divCalcResult").html("");
@@ -334,6 +387,14 @@
 
             //绑定气球检查按钮
             $("button[id^='btnCheckBaloon']").click(function () {
+                //检查用户输入结果
+               if((this.id == "btnCheckBaloonBlue" && g_IsBlue)
+                   || (this.id == "btnCheckBaloonRed" && !g_IsBlue)) {
+                   g_resultBallonOK++;
+               } else {
+                   g_resultBallonFail++;
+               }
+
                 //检查是否经过5秒
                 if(g_BaloonCounter > 0) {
                     //停止倒计时显示
@@ -449,7 +510,7 @@
 <button id="btnGame3" class="btnGame3" type="button" onclick="">粗加工练习</button>
 <button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>
 
-<button id="btnResultTip" class="btnResultTip" type="button"></button>
+<button id="btnResultTip" class="btnResultTip" type="button" style="color: black"></button>
 <button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button>
 <button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button>
 <div id="divTip">
