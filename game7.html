@@ -1,1 +1,481 @@
-commit test
+﻿<!doctype html>
+
+<html>
+
+<head>
+    <title>XXXX练习</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/common.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/commonfunc.js"></script>
+
+    <style>
+        #divRect {
+            left: 2%;
+            top: 5%;
+            width: 96%;
+            height: 85%;
+            position: absolute;
+            border: 1px solid silver;
+            background-color: #8AC4FF;
+        }
+
+        #rect1 {
+            width: 40%;
+            height: 84%;
+            background-color: white;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            border: 4px solid white;
+            text-align: center;
+            color: black;
+            font-size: 16px;
+            font-weight: bolder;
+            background-color: white;
+        / / background-size: 100 % 100 %;
+        }
+
+        .rect {
+            width: 40%;
+            height: 40%;
+            background-color: white;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            border: 4px solid white;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bolder;
+            background-color: white;
+        / / background-size: 100 % 100 %;
+        }
+
+        .number {
+            font-size: 18px;
+            text-align: center;
+            font-weight: bolder;
+            position: absolute;
+            color: white;
+        }
+
+        #btnGame3 {
+            background-color: #D7BA7D;
+        }
+    </style>
+
+    <script type="text/javascript">
+        //============全局配置信息============
+        //结果集
+
+        //Tip相关的定时器和当前步骤值
+        var g_timerTip = null;
+        var g_nTipStep = 0;
+        //选取的题目编号
+        var g_nQuestionId = 1;
+        //当前选择项
+        var m_nCurrentSelect = null;
+
+        var g_ExcuteLoop = 30;          //练习版
+        //var g_ExcuteLoop = 5;           //考试版
+
+        var g_FaketimeSleep = 300;      //故意延迟300ms
+        var g_BaloonCounter = 5;        //倒计时开始
+        var g_BaloonTimeout;            //倒计时器
+
+        function initTips() {
+            $("#tip1").html("屏幕上将同时显示3个任务，请尽可能快速准确的同时处理三个区域中显示的任务");
+            $("#tip2").html("");
+
+            $("#tippoint1").attr("class", "active");
+            $("#tippoint2").attr("class", "");
+            $("#tippoint3").attr("class", "");
+            $("#tippoint4").attr("class", "");
+            $("#tippoint5").attr("class", "");
+            $("#tippoint6").attr("class", "");
+        }
+
+        function startTips() {
+            switch (g_nTipStep) {
+                case 0:
+                    $("#tip1").html("屏幕左边的任务是限时任务，需要在5秒钟之内回答，回答后任务会刷新");
+                    $("#tip2").html("");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "");
+                    $("#tippoint4").attr("class", "");
+                    $("#tippoint5").attr("class", "");
+                    break;
+                case 1:
+
+                    $("#tip1").html("屏幕右边是非限时任务，请尝试判断尽可能多的任务");
+                    $("#tip2").html("作答后系统将自动进入下一个任务，你将<span class='importantTip'>不能</span>返回进行修改。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "");
+                    $("#tippoint5").attr("class", "");
+                    break;
+                case 2:
+                    $("#tip1").html("请用尽可能快的速度完成作答。");
+                    $("#tip2").html("<span class='importantTip'>你即将进入练习环节，熟悉作答方式。<br></span>完成练习后，点击<span class='importantTip'>开始测试</span>按钮进行正式测试。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "");
+                    break;
+            }
+
+            g_nTipStep++;
+
+            if (g_nTipStep == 4) {
+                closeTip();
+            }
+        }
+
+        function startGame() {
+            initGameResult();
+
+            refreshCalcDigital();
+            refreshCompareNumbers();
+            refreshBaloonDisp();
+        }
+
+        function stopGame() {
+
+        }
+        
+        function readyForNextGame() {
+            $("#btnOk").removeAttr("disabled");
+            $("#btnOk").html("继续测试");
+            $("#btnOk").click(function () {
+                //TODO，跳转
+            });
+        }
+
+        function initGameResult() {
+            $("#btnOk").attr("disabled",true);
+        }
+
+        function checkGameResult() {
+            return false
+        }
+
+        function showResult() {
+        }
+
+        //倒计时，到达时间后切换
+        function doImageCountDown() {
+            g_BaloonCounter--;
+            if (g_BaloonCounter > 0) {
+                $("#imgCounter").attr("src", "image/number/" + g_BaloonCounter + ".png");
+                g_BaloonTimeout = setTimeout(doImageCountDown, 1000);
+            } else {
+                //到时间变换
+                refreshBaloonDisp();
+            }
+        }
+
+        //气球倒计时选择
+        function startCountBaloon() {
+            clearTimeout(g_BaloonTimeout);
+
+            //首先随机生成颜色
+            var strColor = "";
+            if (Math.random() > 0.5) {
+                strColor = "red";
+            } else {
+                strColor = "blue";
+            }
+
+            //替换气球图片
+            var baloonurl = "image/game7/" + strColor + ".jpg";
+            $("#divBaloon").css("background-image", "url(" + baloonurl + ")");
+
+            //添加倒计时，5秒
+            var digitalUrl = "image/number/5.png";
+            $("#imgCounter").attr("src", digitalUrl);
+
+            g_BaloonCounter = 5;
+            g_BaloonTimeout = setTimeout(doImageCountDown, 1000);
+        }
+
+        //刷新气球显示
+        function refreshBaloonDisp() {
+            //模拟
+            $("button[id^='btnCheckBaloon']").css("background-color", "gray");
+            $("#divBaloon").css("background-image", "");
+            $("#imgCounter").attr("src", "image/number/blank.png");
+
+            //检查是否到达规定次数
+            g_ExcuteLoop--;
+            if(g_ExcuteLoop <= 0) {
+                clearTimeout(g_BaloonTimeout);
+                readyForNextGame();
+                return;
+            }
+
+            //刷新显示，模拟超时
+            setTimeout(function () {
+                startCountBaloon();
+                $("#btnCheckBaloonBlue").css("background-color", "blue");
+                $("#btnCheckBaloonRed").css("background-color", "red");
+            }, g_FaketimeSleep);
+        }
+
+        //四位数字计算
+        function refreshCalcDigital() {
+            var arrDigtals = [];
+            for (var i = 0; i < 4; i++) {
+                //生成四位随机数
+                arrDigtals[i] = Math.ceil(Math.random() * 9);
+            }
+
+            //生成计算符号，并实际计算
+            var calResutl = arrDigtals[0];
+            var dispResult = arrDigtals[0].toFixed(0);
+            for (var i = 0; i < 3; i++) {
+                if (Math.random() > 0.5) {
+                    dispResult += "+";
+                    calResutl += arrDigtals[i + 1];
+                } else {
+                    dispResult += "-";
+                    calResutl -= arrDigtals[i + 1];
+                }
+
+                dispResult += arrDigtals[i + 1].toFixed(0);
+            }
+
+            //生成公式，50%几率正确
+            dispResult += "=";
+            if (Math.random() > 0.5) {
+                dispResult += calResutl.toFixed(0);
+            } else {
+                dispResult += (calResutl * Math.random()).toFixed(0);
+            }
+
+            $("#divCalcResult").html(dispResult);
+        }
+
+        //比较字符串
+        function refreshCompareNumbers() {
+            //生成随机字符串
+            var strLeft = "";
+            for (var i = 0; i < 5; i++) {
+                //是生成字母还是数字
+                if (Math.random() > 0.5) {
+                    strLeft += String.fromCharCode(Math.floor(Math.random() * 26) + "A".charCodeAt(0));
+                } else {
+                    strLeft += String.fromCharCode(Math.floor(Math.random() * 10) + "0".charCodeAt(0));
+                }
+            }
+
+            //生成比较字符串，40%的几率相等
+            var strRight = "";
+            if (Math.random() > 0.6) {
+                strRight = strLeft;
+            } else {
+                //随机替换一些字符
+                for (var i = 0; i < 5; i++) {
+                    if (Math.random() > 0.2) {
+                        strRight += strLeft.charAt(i);
+                    } else {
+                        strRight += String.fromCharCode(Math.floor(Math.random() * 26) + "A".charCodeAt(0));
+                    }
+                }
+            }
+
+            $("#divnumberleft").html(strLeft);
+            $("#divnumberright").html(strRight);
+        }
+
+        function clickButton() {
+            startGame();
+        }
+
+        //初始化
+        $(function () {
+            //绑定数字比较点击按钮
+            $("button[id^='btnNumberCompare']").click(function () {
+                //模拟
+                $("button[id^='btnNumberCompare']").css("background-color", "gray");
+                $("#divnumberleft").html("");
+                $("#divnumberright").html("");
+
+                //刷新显示，模拟超时
+                setTimeout(function () {
+                    refreshCompareNumbers();
+                    $("#btnNumberCompareSame").css("background-color", "limegreen");
+                    $("#btnNumberCompareDiff").css("background-color", "red");
+                }, g_FaketimeSleep);
+            });
+
+            //绑定竖式计算按钮
+            $("button[id^='btnCalcDigital']").click(function () {
+                //模拟
+                $("button[id^='btnCalcDigital']").css("background-color", "gray");
+                $("#divCalcResult").html("");
+
+                //刷新显示，模拟超时
+                setTimeout(function () {
+                    refreshCalcDigital();
+                    $("#btnCalcDigitalOK").css("background-color", "limegreen");
+                    $("#btnCalcDigitalBad").css("background-color", "red");
+                }, g_FaketimeSleep);
+            });
+
+            //绑定气球检查按钮
+            $("button[id^='btnCheckBaloon']").click(function () {
+                //检查是否经过5秒
+                if(g_BaloonCounter > 0) {
+                    //停止倒计时显示
+                    clearTimeout(g_BaloonTimeout);
+
+                    //未到时间显示等待，并定时切换
+                    $("button[id^='btnCheckBaloon']").css("background-color", "gray");
+                    $("#divBaloon").css("background-image", "");
+                    $("#imgCounter").attr("src", "image/number/blank.png");
+
+                    $("#tdBalloonTitle").html("等待刷新。。。");
+
+                    g_BaloonTimeout = setTimeout(function () {
+                        //清理显示
+                        $("#tdBalloonTitle").html("");
+                        //切换
+                        refreshBaloonDisp();
+                    }, g_BaloonCounter*1000);
+
+                } else {
+                    //到时间直接切换
+                    refreshBaloonDisp();
+                }
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+<div id="divRect">
+    <div id="rect1" style="left:8%;top:8%;">
+        <div style="top:0%;width:100%;height:80%;">
+            <table style="height: 100%; width: 100%;">
+                <tr style="height: 5%">
+                    <td style="width: 10%;"></td>
+                    <td id="tdBalloonTitle"></td>
+                    <td style="width: 10%;"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <div id="divBaloon"
+                             style="margin:0 auto; width: 300px; height: 300px; background-image: url(''); background-size:100%; ">
+                            <div style="position:relative; top: 50px; left: 100px; width: 100px; height: 100px; ">
+                                <img id="imgCounter" src="image/number/blank.png" width="100%" height="100%">
+                            </div>
+
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr style="height: 5%">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+        </div>
+        <div style="top:70%;width:100%;height:20%;">
+            <p>根据气球颜色选择相应的颜色按钮</p>
+            <button id="btnCheckBaloonBlue" type="button"
+                    style="position: absolute;left:10%;width:35%;background-color:blue;">蓝色
+            </button>
+            <button id="btnCheckBaloonRed" type="button"
+                    style="position: absolute;left:55%;width:35%;background-color:red;">红色
+            </button>
+        </div>
+    </div>
+    <div id="rectA" class="rect" style="left:52%;top:8%;">
+        <div style="position: absolute;top:6%;width:100%;height:16%;">下列公式的计算结果是否正确？</div>
+        <div style="position: absolute;top:24%;width:100%;height:50%;">
+            <div id="divCalcResult"
+                 style="font-weight:bold; font-size: 20px; position: absolute;top:40%; left: 0%; margin:0 auto; width: 100%; height: 30%;">
+            </div>
+        </div>
+        <button id="btnCalcDigitalOK" type="button"
+                style="position: absolute;top:82%;left:10%;width:35%;height:16%;background-color:limegreen;">正确
+        </button>
+        <button id="btnCalcDigitalBad" type="button"
+                style="position: absolute;top:82%;left:55%;width:35%;height:16%;background-color:red;">错误
+        </button>
+    </div>
+    <div id="rectB" class="rect" style="left:52%;top:52%;">
+        <div style="position: absolute;top:6%;width:100%;height:16%;">下面两组字符，是否完全相同？</div>
+        <div style="position: absolute;top:24%;width:100%;height:50%;">
+            <table style="width: 100%; height: 100%">
+                <tr>
+                    <td style="width: 25%;"></td>
+                    <td style="width: 25%;">
+                        <div id="divnumberleft"
+                             style="font-weight:bold; font-size: 20px; height: 50px; width: 100px;"></div>
+                    </td>
+                    <td style="width: 25%;">
+                        <div id="divnumberright"
+                             style="font-weight:bold; font-size: 20px; height: 50px; width: 100px;"></div>
+                    </td>
+                    <td style="width: 25%;"></td>
+                </tr>
+            </table>
+        </div>
+        <button id="btnNumberCompareSame" type="button"
+                style="position: absolute;top:82%;left:10%;width:35%;height:16%;background-color:limegreen;">是
+        </button>
+        <button id="btnNumberCompareDiff" type="button"
+                style="position: absolute;top:82%;left:55%;width:35%;height:16%;background-color:red;">否
+        </button>
+    </div>
+</div>
+<button id="btnGame1" class="btnGame1" type="button" onclick="openGame1()">注意稳定性练习</button>
+<button id="btnGame2" class="btnGame2" type="button" onclick="openGame2()">记忆容量练习</button>
+<button id="btnGame3" class="btnGame3" type="button" onclick="">粗加工练习</button>
+<button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>
+
+<button id="btnResultTip" class="btnResultTip" type="button"></button>
+<button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button>
+<button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button>
+<div id="divTip">
+    <div class="panel panel-primary mypanel">
+        <div class="panel-heading">
+            <h3 class="panel-title center">答题说明</h3>
+            <button type="button" class="close tipclosebtn" onclick="closeTip()">&times;</button>
+        </div>
+        <div class="panel-body mypanelbody">
+            <p id="tip1">你将在屏幕上看到5张图片。</p>
+            <p id="tip2"></p>
+            <ol class="carousel-indicators iter">
+                <li id="tippoint1" class="active" data-slide-to="0"></li>
+                <li id="tippoint2" data-slide-to="1"></li>
+                <li id="tippoint3" data-slide-to="2"></li>
+                <li id="tippoint4" data-slide-to="3"></li>
+                <li id="tippoint5" data-slide-to="4"></li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    showTip();
+
+</script>
+</body>
+
+</html>
