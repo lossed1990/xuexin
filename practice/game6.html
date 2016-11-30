@@ -41,7 +41,6 @@
             background-position: center;
             position: absolute;
         }
-
     </style>
 
     <script type="text/javascript">
@@ -54,6 +53,11 @@
         //============全局配置信息============
         //结果集,随机选取的数字
         var g_arrayResult = [
+            [16, 18, 25, 29, 36],
+            [5, 18, 25, 34, 36],
+            [8, 12, 17, 32, 36],
+            [20, 22, 26, 29, 32],
+            [2, 3, 6, 16, 31],
             [1, 14, 25, 29, 31],
             [8, 9, 11, 15, 24],
             [14, 16, 23, 24, 35],
@@ -215,6 +219,7 @@
 
         function initGameResult() {
             g_nSelectRectCount = 0;
+            $("#id-select-count").html('0');
             btnResultTip.innerHTML = "";
             g_arraySelect.length = 0;
             g_nSeconds = 30;
@@ -253,7 +258,7 @@
 
                 btnOk.innerHTML = "继续测试";
                 g_bCanSlecetRect = false;
-                if (g_nTotalPlayCount === 19) {
+                if (g_nTotalPlayCount === 24) {
                     alert("测试结束！");
                     window.location.reload();
                     return;
@@ -324,6 +329,7 @@
     <button id="btnResultTip" class="btnResultTip" type="button"></button>
     <button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button>
     <button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button>
+    <button id="btnOther" class="fa fa-exclamation-circle" type="button">&nbsp;已选择&nbsp;<span id="id-select-count" style="color:red;">0</span>&nbsp;处</button>
     <div id="divTip">
         <div class="panel panel-primary mypanel">
             <div class="panel-heading">
@@ -377,6 +383,8 @@
             } else {
                 btnOk.disabled = 'disabled';
             }
+
+            $("#id-select-count").html(g_nSelectRectCount);
         }
     </script>
 </body>
