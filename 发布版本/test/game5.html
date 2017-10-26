@@ -1,0 +1,312 @@
+<!doctype html>
+<html>
+<head>
+<title>空间记忆容量测试</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8">
+<link rel="stylesheet" href="../css/bootstrap.min.css">
+<link rel="stylesheet" href="../css/common.css">
+<link rel="stylesheet" href="../css/font-awesome/css/font-awesome.min.css">
+<script src="../js/jquery.min.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<script src="../js/commonfunc.js"></script>
+<script type="text/javascript" src="../js/js.cookie.js"></script>
+<style>
+#divRect {
+left: 2%;
+top: 5%;
+width: 96%;
+height: 85%;
+position: absolute;
+border: 1px solid silver;
+background-color: white;
+}
+.rect {
+width: 16%;
+height: 16%;
+background-color: #8AC4FF;
+background-repeat: no-repeat;
+background-position: center;
+position: absolute;
+border: 2px solid white;
+border-radius: 15px;
+line-height: 100%;
+text-align: center;
+font-size: 100%;
+}
+</style>
+<script type="text/javascript">
+var g_arrayResult = new Array();
+var g_arraySelect = new Array();
+var g_timerTip = null;
+var g_nTipStep = 0;
+var g_timerGame = null;
+var g_nSelectRectCount = 0;
+var g_bCanSlecetRect = false;
+var g_nStarMinCount = 3;
+var g_nStarMaxCount = 9;
+var g_nTotalPlayCount = 0;
+function showStars() {
+btnOk.disabled = 'disabled';
+g_bCanSlecetRect = false;
+g_arrayResult.length = 0;
+g_nStarMinCount = Math.min(parseInt(g_nTotalPlayCount / 3, 10) + 3, 6);
+g_nStarMaxCount = g_nStarMinCount;
+var nStarCount = parseInt(Math.random() * (g_nStarMaxCount - g_nStarMinCount + 1) + g_nStarMinCount, 10); 
+for (var i = 0; i < nStarCount; ++i) {
+var nIndex = parseInt(Math.random() * 36 + 1, 10); 
+while (g_arrayResult.indexOf(nIndex) != -1) {
+nIndex = parseInt(Math.random() * 36 + 1, 10); 
+}
+var item = document.getElementById('rect' + nIndex);
+item.style.backgroundColor = 'green'
+item.style.backgroundImage = 'url(../image/number/' + (i + 1) + '.png)';
+g_arrayResult.push(nIndex);
+}
+}
+function hideStars() {
+for (var i = 1; i <= 36; ++i) {
+var item = document.getElementById('rect' + i);
+item.style.backgroundImage = '';
+item.style.backgroundColor = '#8AC4FF'; 
+item.state = 0;
+item.index = i;
+}
+}
+function initTips() {
+$("#tip1").html("屏幕上将呈现一个6*6的正方形网格。");
+$("#tip2").html("");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "");
+$("#tippoint3").attr("class", "");
+$("#tippoint4").attr("class", "");
+$("#tippoint5").attr("class", "");
+$("#tippoint6").attr("class", "");
+}
+function startTips() {
+switch (g_nTipStep) {
+case 0:
+$("#tip1").html("其中一些单元格会呈现数字，");
+$("#tip2").html("你需要尽量记住单元格上数字的位置和顺序，<br>之后，数字会消失。");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "");
+$("#tippoint4").attr("class", "");
+$("#tippoint5").attr("class", "");
+$("#tippoint6").attr("class", "");
+break;
+case 1:
+$("#tip1").html("根据记忆，用鼠标左键按数字大小顺序点击单元格，");
+$("#tip2").html("被选中的单元格会按照选择的顺序编号。");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "active");
+$("#tippoint4").attr("class", "");
+$("#tippoint5").attr("class", "");
+$("#tippoint6").attr("class", "");
+break;
+case 2:
+$("#tip1").html("如果需要取消选择，请单击左下角的“重新选择”按钮。");
+$("#tip2").html("被选中的单元格需要<span class='importantTip'>等于</span>呈现的数字的数量。");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "active");
+$("#tippoint4").attr("class", "active");
+$("#tippoint5").attr("class", "");
+$("#tippoint6").attr("class", "");
+break;
+case 3:
+$("#tip1").html("完成选择后请按“确定选择”按钮进行确认。");
+$("#tip2").html("作答后系统将自动进入下一组任务，<br><span class='importantTip'>你将不能返回进行修改。</span>");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "active");
+$("#tippoint4").attr("class", "active");
+$("#tippoint5").attr("class", "active");
+$("#tippoint6").attr("class", "");
+break;
+case 4:
+$("#tip1").html("请用尽可能快的速度完成作答。");
+$("#tip2").html("<span class='importantTip'>你即将进入练习环节，熟悉作答方式。<br></span>完成练习后，点击<span class='importantTip'>开始测试</span>按钮进行正式测试。");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "active");
+$("#tippoint4").attr("class", "active");
+$("#tippoint5").attr("class", "active");
+$("#tippoint6").attr("class", "active");
+}
+g_nTipStep++;
+if (g_nTipStep == 6) {
+closeTip();
+}
+}
+function startGame() {
+initGameResult();
+showStars();
+g_timerGame = setTimeout(function() {
+hideStars();
+g_bCanSlecetRect = true;
+}, 1000);
+}
+function stopGame() {
+window.clearTimeout(g_timerGame);
+initGameResult();
+}
+function initGameResult() {
+hideStars();
+g_nSelectRectCount = 0;
+btnResultTip.innerHTML = "";
+g_arraySelect.length = 0;
+}
+function checkGameResult() {
+var bResult = true;
+if (g_nSelectRectCount === g_arrayResult.length) {
+for (var i = 0; i < g_nSelectRectCount; i++) {
+if (g_arraySelect[i] != g_arrayResult[i]) {
+bResult = false;
+break;
+}
+}
+}
+return bResult;
+}
+function showResult() {
+for (var i = 0; i < g_arrayResult.length; i++) {
+var item = document.getElementById('rect' + g_arrayResult[i]);
+item.style.backgroundImage = 'url(../image/number/' + (i + 1) + '.png)';
+if (g_arrayResult[i] != g_arraySelect[i]) {
+item.style.backgroundColor = '#D7BA7D';
+} else {
+item.style.backgroundColor = 'green';
+}
+}
+}
+function clearSelect() {
+if (btnResultTip.innerHTML == "重新选择") {
+initGameResult();
+btnOk.disabled = 'disabled';
+}
+}
+function clickButton() {
+if (btnOk.innerHTML == "确认选择") {
+var bResult = checkGameResult();
+if (bResult === true) {
+showResult();
+btnResultTip.style.color = "#5CB65C";
+btnResultTip.innerHTML = "恭喜你，答对了！";
+} else {
+btnResultTip.style.color = "red";
+btnResultTip.innerHTML = "很抱歉，答错了！";
+showResult();
+}
+btnOk.innerHTML = "继续测试";
+g_bCanSlecetRect = false;
+if (g_nTotalPlayCount === 11) {
+alert("测试结束！");
+window.location.reload();
+return;
+}
+g_nTotalPlayCount++;
+} else {
+startGame();
+btnOk.innerHTML = "确认选择";
+}
+}
+</script>
+</head>
+<body>
+<div id="divRect">
+<div id="rect1" class="rect" style="left:2%;top:2%" onclick="onRectClick()"></div>
+<div id="rect2" class="rect" style="left:18%;top:2%" onclick="onRectClick()"></div>
+<div id="rect3" class="rect" style="left:34%;top:2%" onclick="onRectClick()"></div>
+<div id="rect4" class="rect" style="left:50%;top:2%" onclick="onRectClick()"></div>
+<div id="rect5" class="rect" style="left:66%;top:2%" onclick="onRectClick()"></div>
+<div id="rect6" class="rect" style="left:82%;top:2%" onclick="onRectClick()"></div>
+<div id="rect7" class="rect" style="left:2%;top:18%" onclick="onRectClick()"></div>
+<div id="rect8" class="rect" style="left:18%;top:18%" onclick="onRectClick()"></div>
+<div id="rect9" class="rect" style="left:34%;top:18%" onclick="onRectClick()"></div>
+<div id="rect10" class="rect" style="left:50%;top:18%" onclick="onRectClick()"></div>
+<div id="rect11" class="rect" style="left:66%;top:18%" onclick="onRectClick()"></div>
+<div id="rect12" class="rect" style="left:82%;top:18%" onclick="onRectClick()"></div>
+<div id="rect13" class="rect" style="left:2%;top:34%" onclick="onRectClick()"></div>
+<div id="rect14" class="rect" style="left:18%;top:34%" onclick="onRectClick()"></div>
+<div id="rect15" class="rect" style="left:34%;top:34%" onclick="onRectClick()"></div>
+<div id="rect16" class="rect" style="left:50%;top:34%" onclick="onRectClick()"></div>
+<div id="rect17" class="rect" style="left:66%;top:34%" onclick="onRectClick()"></div>
+<div id="rect18" class="rect" style="left:82%;top:34%" onclick="onRectClick()"></div>
+<div id="rect19" class="rect" style="left:2%;top:50%" onclick="onRectClick()"></div>
+<div id="rect20" class="rect" style="left:18%;top:50%" onclick="onRectClick()"></div>
+<div id="rect21" class="rect" style="left:34%;top:50%" onclick="onRectClick()"></div>
+<div id="rect22" class="rect" style="left:50%;top:50%" onclick="onRectClick()"></div>
+<div id="rect23" class="rect" style="left:66%;top:50%" onclick="onRectClick()"></div>
+<div id="rect24" class="rect" style="left:82%;top:50%" onclick="onRectClick()"></div>
+<div id="rect25" class="rect" style="left:2%;top:66%" onclick="onRectClick()"></div>
+<div id="rect26" class="rect" style="left:18%;top:66%" onclick="onRectClick()"></div>
+<div id="rect27" class="rect" style="left:34%;top:66%" onclick="onRectClick()"></div>
+<div id="rect28" class="rect" style="left:50%;top:66%" onclick="onRectClick()"></div>
+<div id="rect29" class="rect" style="left:66%;top:66%" onclick="onRectClick()"></div>
+<div id="rect30" class="rect" style="left:82%;top:66%" onclick="onRectClick()"></div>
+<div id="rect31" class="rect" style="left:2%;top:82%" onclick="onRectClick()"></div>
+<div id="rect32" class="rect" style="left:18%;top:82%" onclick="onRectClick()"></div>
+<div id="rect33" class="rect" style="left:34%;top:82%" onclick="onRectClick()"></div>
+<div id="rect34" class="rect" style="left:50%;top:82%" onclick="onRectClick()"></div>
+<div id="rect35" class="rect" style="left:66%;top:82%" onclick="onRectClick()"></div>
+<div id="rect36" class="rect" style="left:82%;top:82%" onclick="onRectClick()"></div>
+</div>
+<button id="btnGame1" class="btnGame1 fa fa-home fa-2x" type="button" onclick="window.location = '../index.html';">返回主页</button>
+<!--<button id="btnGame1" class="btnGame1" type="button" onclick="openGame1()">注意稳定性练习</button>
+<button id="btnGame2" class="btnGame2" type="button" onclick="">记忆容量练习</button>
+<button id="btnGame3" class="btnGame3" type="button" onclick="openGame3()">粗加工练习</button>
+<button id="btnGame4" class="btnGame4" type="button" onclick="openGame4()">细加工练习</button>-->
+<button id="btnResultTip" class="btnResultTip" type="button" onclick="clearSelect()"></button>
+<button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button>
+<button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button>
+<div id="divTip">
+<div class="panel panel-primary mypanel">
+<div class="panel-heading">
+<h3 class="panel-title center">答题说明</h3>
+<button type="button" class="close tipclosebtn" onclick="closeTip()">&times;</button>
+</div>
+<div class="panel-body mypanelbody">
+<p id="tip1">屏幕上将呈现一个6*6的正方形网格。</p>
+<p id="tip2"></p>
+<ol class="carousel-indicators iter">
+<li id="tippoint1" class="active" data-slide-to="0"></li>
+<li id="tippoint2" data-slide-to="1"></li>
+<li id="tippoint3" data-slide-to="2"></li>
+<li id="tippoint4" data-slide-to="3"></li>
+<li id="tippoint5" data-slide-to="4"></li>
+<li id="tippoint6" data-slide-to="5"></li>
+</ol>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+showTip();
+function onRectClick() {
+if (g_bCanSlecetRect === false) {
+return;
+}
+if (g_nSelectRectCount >= g_arrayResult.length) {
+return;
+}
+if (event.target.state === 1) {
+} else {
+event.target.style.backgroundColor = 'green'; 
+event.target.state = 1;
+g_nSelectRectCount++;
+if (g_nSelectRectCount <= g_arrayResult.length) {
+event.target.style.backgroundImage = 'url(../image/number/' + g_nSelectRectCount + '.png)';
+g_arraySelect.push(event.target.index);
+}
+}
+if (g_nSelectRectCount === g_arrayResult.length) {
+btnOk.removeAttribute('disabled');
+} else {
+btnOk.disabled = 'disabled';
+}
+btnResultTip.style.color = "#8AC4FF";
+btnResultTip.innerHTML = "重新选择";
+}
+</script>
+</body>
+</html>

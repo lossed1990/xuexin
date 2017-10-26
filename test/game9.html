@@ -1,0 +1,502 @@
+﻿<!doctype html>
+
+<html>
+
+<head>
+    <title>认知能力目标物移动测试</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/font-awesome/css/font-awesome.min.css">
+
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/commonfunc.js"></script>
+    <script type="text/javascript" src="../js/js.cookie.js"></script>
+    <style>
+	    #divMoveRect {
+            left: 2%;
+            top: 5%;
+            width: 96%;
+            height: 85%;
+            position: absolute;
+            border: 1px solid silver;
+            background-color: #8AC4FF;
+        }
+		
+        #divGameRect {
+            position: absolute;
+            border: 3px solid silver;
+			border-color: red;
+            background-color: #FFFFFF;
+			border-radius: 50%;	
+        }
+		
+		#divMouse {
+            position: absolute;
+            border-radius: 50%;
+			z-index:1;
+		}
+        
+        .ball {
+            background-color: #00FF00;
+            position: absolute;
+            border-radius: 50%;
+        }
+    </style>
+
+    <script type="text/javascript">
+	    //封装类
+		//游戏区域对象
+		var GameRectObject = {
+			createNew: function() {
+				var object = {};
+				//=====私有成员变量=====     
+				
+				var $m_ui_rect = $('#divMoveRect');
+				var $m_ui_gamerect = $('#divGameRect');
+				var m_nX;
+				var m_nY;
+				var m_nR;
+				
+				//初始化位置信息
+				object.initPos = function() {
+				    var nWindowWidth = $m_ui_rect.width();
+					var nWindowHeight = $m_ui_rect.height();
+				    m_nR = Math.min(nWindowWidth,nWindowHeight) / 2 - 20;
+					m_nX = nWindowWidth / 2;
+					m_nY = nWindowHeight / 2;
+					$m_ui_gamerect.css("left",m_nX - m_nR).css("top",m_nY - m_nR).css("width",m_nR*2).css("height",m_nR*2);
+				};
+				//碰撞检测
+				object.hitTest = function(mouseobject) {
+				    if((Math.pow((mouseobject.getX()-m_nX),2) + Math.pow((mouseobject.getY()-m_nY),2)) < Math.pow((mouseobject.getR()-m_nR),2)) {
+					    return false;
+					}
+				    return true;
+				};
+				
+				object.getX = function() {
+				    return m_nX;
+				};
+				object.getY = function() {
+				    return m_nY;
+				};
+				object.getR = function() {
+				    return m_nR;
+				};
+
+				return object;
+			}
+		};
+		
+		//移动球对象
+        var BallObject = {
+		    createNew: function() {
+			    var object = {};
+				//=====私有成员变量=====   
+                var $m_divball = null;  //小球html元素，及位置大小参数				
+				var m_nX;
+				var m_nY;
+				var m_nR;   
+				var m_nCenterX;         //移动区域参数
+				var m_nCenterY;
+				var m_nCenterR;
+				var m_nMoveDirection;   //移动方向 0-右下 1-左下 2-右上 3-左上
+				var m_nMoveStepX = 1;   //移动步长 
+				var m_nMoveStepY = 2;
+				
+				//初始化位置信息
+				object.initPos = function(x,y,r) {
+				    $m_divball = $("<div></div>").attr("class","ball");     //创建新元素
+                    $('#divGameRect').after($m_divball);                        
+					
+					m_nCenterX = x;
+					m_nCenterY = y;
+					m_nCenterR = r;
+					randompos(); //根据游戏区域大小，随机获取球半径
+					$m_divball.css("left",m_nX-m_nR).css("top",m_nY - m_nR).css("width",m_nR * 2).css("height",m_nR * 2);
+					
+					//随机一个方向移动。		
+					m_nMoveDirection = parseInt(Math.random()*4,10);	
+				};
+							
+				//移动
+				object.moveBall = function() {
+				    //撞边调整方向，根据所属象限，修正x、y值（一：x+ y+；二：x- y+；三：x+ y-；四：x- y-）
+					if(hitBorder()) {					   	
+					    if(m_nX <= m_nCenterX && m_nY <= m_nCenterY) {
+						    m_nMoveDirection = 0;	
+						}
+						else if(m_nX > m_nCenterX && m_nY <= m_nCenterY) {
+						    m_nMoveDirection = 1;
+						}
+						else if(m_nX <= m_nCenterX && m_nY > m_nCenterY) {
+						    m_nMoveDirection = 2;
+						}
+						else {
+						    m_nMoveDirection = 3;
+						}
+						
+						//随机选取移动步长 1-4之间
+						m_nMoveStepX = parseInt(Math.random()*4+1,10);
+						m_nMoveStepY = parseInt(Math.random()*4+1,10);
+					}				
+					switch(m_nMoveDirection){
+					case 0:
+					    m_nX += m_nMoveStepX;
+					    m_nY += m_nMoveStepY;
+					    break;
+					case 1:
+					    m_nX -= m_nMoveStepX;
+					    m_nY += m_nMoveStepY;
+					    break;
+					case 2:
+					    m_nX += m_nMoveStepX;
+					    m_nY -= m_nMoveStepY;
+					    break;
+					case 3:
+					    m_nX -= m_nMoveStepX;
+					    m_nY -= m_nMoveStepY;
+					    break;
+					}
+					$m_divball.css("left",m_nX-m_nR).css("top",m_nY - m_nR).css("width",m_nR * 2).css("height",m_nR * 2);			
+				};
+				
+				//碰撞检测
+				object.hitTest = function(mouseobject) {				    
+				    if((Math.pow((mouseobject.getX()-m_nX),2) + Math.pow((mouseobject.getY()-m_nY),2)) >= Math.pow((mouseobject.getR()+m_nR),2)) {
+					    return false;
+					}
+				    return true;
+				};
+				
+				//根据游戏区域大小，随机获取球半径
+				function randompos() {
+				    //半径范围
+				    var nMinR = m_nCenterR / 20;
+					var nMaxR = m_nCenterR / 10;
+				    m_nR = parseInt(Math.random()*(nMaxR-nMinR+1)+nMinR,10);
+                    //x点范围
+					var nMinX = m_nCenterX - m_nCenterR + m_nR;
+					var nMaxX = m_nCenterX + m_nCenterR - m_nR;
+                    m_nX = nMinX;//parseInt(Math.random()*(nMaxX-nMinX+1)+nMinX,10);				
+					//y点范围
+					var nY = Math.sqrt(Math.pow((m_nCenterR-m_nR),2) - Math.pow((m_nCenterX-m_nX),2));  //|y-y1|的绝对值
+					var nMinY = m_nCenterY - nY;
+					var nMaxY = m_nCenterY + nY;
+					m_nY = parseInt(Math.random()*(nMaxY-nMinY+1)+nMinY,10);				
+				}
+		
+				//是否撞边
+				function hitBorder() {
+				    if((Math.pow((m_nCenterX-m_nX),2) + Math.pow((m_nCenterY-m_nY),2)) >= Math.pow((m_nCenterR-m_nR),2)) {
+					    return true;
+					}
+				    return false;
+				}
+				
+				return object;
+			}
+		};
+
+	    //鼠标移动对象
+		var MouseObject = {
+		    createNew: function() {
+			    var object = {};
+				//=====私有成员变量===== 
+				var $m_ui_rect = $('#divMoveRect');
+				var m_nLeft = $m_ui_rect.offset().left;
+				var m_nTop = $m_ui_rect.offset().top;
+				var $m_divmouse =  $('#divMouse');
+				var m_nX;
+				var m_nY;
+				var m_nR = 16;
+				var m_bStart = false;
+				
+				//初始化位置信息
+				object.initPos = function(x,y,r) {
+				    m_nX = x;                  
+                    m_nY = y;
+					$m_divmouse.css("left",m_nX-m_nR).css("top",m_nY - m_nR).css("width",m_nR * 2).css("height",m_nR * 2);
+					m_bStart = false;
+				};
+				//设置位置信息
+				object.setPos = function(e) {
+				    if(m_bStart) {
+						m_nX = e.clientX - m_nLeft;
+						m_nY = e.clientY - m_nTop;
+						$m_divmouse.css("left",m_nX-m_nR).css("top",m_nY - m_nR).css("width",m_nR * 2).css("height",m_nR * 2);
+					}
+				};
+				
+				object.startMove = function(b) {
+				    m_bStart = b;
+				}
+				
+				object.getX = function() {
+				    return m_nX;
+				};
+				
+				object.getY = function() {
+				    return m_nY;
+				};
+				
+				object.getR = function() {
+				    return m_nR;
+				};
+				
+				return object;
+			}
+		};
+	
+        $(function() {
+            if (Cookies.get('login') != "1") {
+                //alert("学信教育提示您：做题前，请先登录，谢谢！");
+                //window.location = "../index.html";
+            }
+        });
+		
+		//Tip相关的定时器和当前步骤值
+        var g_timerTip = null;
+        var g_nTipStep = 0;
+		
+		var g_timerGame = null;
+		
+		function initTips() {
+            $("#tip1").html("你将在屏幕上看到一个圆形区域");
+            $("#tip2").html("");
+
+            $("#tippoint1").attr("class", "active");
+            $("#tippoint2").attr("class", "");
+            $("#tippoint3").attr("class", "");
+            $("#tippoint4").attr("class", "");
+            $("#tippoint5").attr("class", "");
+            $("#tippoint6").attr("class", "");
+            $("#tippoint7").attr("class", "");
+        }
+
+        function startTips() {
+            switch (g_nTipStep) {
+                case 0:
+                    $("#tip1").html("在圆形区域中随机分布6-10个圆形障碍物");
+                    $("#tip2").html("");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "");
+                    $("#tippoint4").attr("class", "");
+                    $("#tippoint5").attr("class", "");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 1:
+                    $("#tip1").html("和一个几何形状目标物。");
+                    $("#tip2").html("");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "");
+                    $("#tippoint5").attr("class", "");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 2:
+                    $("#tip1").html("移动鼠标，目标物随之移动位置。");
+                    $("#tip2").html("");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 3:
+                    $("#tip1").html("您需要操作目标物及躲避障碍物");
+                    $("#tip2").html("同时避免触碰到圆形区域的边界");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "active");
+                    $("#tippoint6").attr("class", "");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 4:
+                    $("#tip1").html("一旦碰到障碍物或圆形区域边界");
+                    $("#tip2").html("本次任务结束。");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "active");
+                    $("#tippoint6").attr("class", "active");
+                    $("#tippoint7").attr("class", "");
+                    break;
+                case 5:
+                    $("#tip1").html("用鼠标左键再次点击目标物");
+                    $("#tip2").html("继续开始下一次任务");
+
+                    $("#tippoint1").attr("class", "active");
+                    $("#tippoint2").attr("class", "active");
+                    $("#tippoint3").attr("class", "active");
+                    $("#tippoint4").attr("class", "active");
+                    $("#tippoint5").attr("class", "active");
+                    $("#tippoint6").attr("class", "active");
+                    $("#tippoint7").attr("class", "active");
+                    break;
+            }
+
+            g_nTipStep++;
+
+            if (g_nTipStep == 7) {
+                closeTip();
+            }
+        }
+
+    </script>
+</head>
+
+<body>
+    <div id="divMoveRect">
+	    <div id="divMouse">
+			<img src="arrow_up_double.png"  alt="目标物"/>
+		</div>
+	    <div id="divGameRect"></div>
+    </div>
+    <button id="btnGame1" class="btnGame1 fa fa-home fa-2x" type="button" onclick="window.location = '../index.html';">返回主页</button>
+
+    <button id="btnResultTip" class="btnResultTip" type="button"></button>
+    <button id="btnOk" class="btnOk" type="button" onclick="clickButton()">开始测试</button>
+    <button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button>
+    <div id="divTip" style="z-index:2">
+        <div class="panel panel-primary mypanel">
+            <div class="panel-heading">
+                <h3 class="panel-title center">答题说明</h3>
+                <button type="button" class="close tipclosebtn" onclick="closeTip()">&times;</button>
+            </div>
+            <div class="panel-body mypanelbody">
+                <p id="tip1">你将在屏幕上看到一个圆形区域</p>
+                <p id="tip2"></p>
+                <ol class="carousel-indicators iter">
+                    <li id="tippoint1" class="active" data-slide-to="0"></li>
+                    <li id="tippoint2" data-slide-to="1"></li>
+                    <li id="tippoint3" data-slide-to="2"></li>
+                    <li id="tippoint4" data-slide-to="3"></li>
+                    <li id="tippoint5" data-slide-to="4"></li>
+                    <li id="tippoint6" data-slide-to="5"></li>
+                    <li id="tippoint7" data-slide-to="6"></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+	    var g_bStart = false;
+	    var g_nCount = 0;
+		var g_nSpeed = 10;
+	
+	    var g_oGameRectObject = GameRectObject.createNew();
+		g_oGameRectObject.initPos();
+		
+		//小球信息
+		var m_arrayBallInfo = new Array();
+		//小球个数
+        var g_nBallCount = 6;
+		//创建小球对象
+		for (var i = 0; i < g_nBallCount; i++) {
+			var newBallObject = BallObject.createNew();
+			newBallObject.initPos(g_oGameRectObject.getX(),g_oGameRectObject.getY(),g_oGameRectObject.getR());
+			m_arrayBallInfo.push(newBallObject);
+		}
+		//鼠标控件	
+		var g_oMouseObject = MouseObject.createNew();
+		g_oMouseObject.initPos(g_oGameRectObject.getX(),g_oGameRectObject.getY(),g_oGameRectObject.getR());
+
+		//点击事件 
+		$('#divMouse').click(function(){	
+            if(g_bStart) {
+                return;		
+            }				
+			startGame();  
+		});
+		
+		//检测鼠标
+		$('#divMoveRect').mousemove(function(e){	  
+		    g_oMouseObject.setPos(e);  
+		});
+		
+		window.onresize = function() {
+            initPos();
+        }
+		
+		showTip();
+		
+		function initPos() {
+		     //初始化位置
+		    g_oGameRectObject.initPos();
+			g_oMouseObject.initPos(g_oGameRectObject.getX(),g_oGameRectObject.getY(),g_oGameRectObject.getR());
+			//删除小球元素
+			$("div").remove(".ball");
+			m_arrayBallInfo.length = 0;
+			for (var i = 0; i < g_nBallCount; i++) {
+				var newBallObject = BallObject.createNew();
+				newBallObject.initPos(g_oGameRectObject.getX(),g_oGameRectObject.getY(),g_oGameRectObject.getR());
+				m_arrayBallInfo.push(newBallObject);
+			}
+		}
+		
+		function startGame() {
+		    initPos();
+		    g_oMouseObject.startMove(true);
+			g_timerGame = setInterval(function() {
+				if(g_oGameRectObject.hitTest(g_oMouseObject)) {
+				    alert("出位置,失败");
+					window.clearTimeout(g_timerGame);
+					g_oMouseObject.initPos(g_oGameRectObject.getX(),g_oGameRectObject.getY(),g_oGameRectObject.getR());
+				    g_nCount = 0;
+					g_bStart = false;
+					return;
+				}
+				
+				for (var i = 0; i < m_arrayBallInfo.length; i++) {
+				    if(m_arrayBallInfo[i].hitTest(g_oMouseObject)) {
+					    alert("碰小球,失败");
+						window.clearTimeout(g_timerGame);
+						g_oMouseObject.initPos(g_oGameRectObject.getX(),g_oGameRectObject.getY(),g_oGameRectObject.getR());
+						g_nCount = 0;
+						g_bStart = false;
+				        return;
+					}
+                    m_arrayBallInfo[i].moveBall();
+				}
+			    ++g_nCount;
+				
+				if(g_nCount >= (120000 / g_nSpeed))//2分钟
+				{
+				    alert("成功，点击继续");
+					window.clearTimeout(g_timerGame);
+					g_oMouseObject.initPos(g_oGameRectObject.getX(),g_oGameRectObject.getY(),g_oGameRectObject.getR());
+					g_nCount = 0;
+					++g_nBallCount;
+					--g_nSpeed;
+					g_bStart = false;
+				}
+            }, g_nSpeed);
+			
+			g_bStart = true;
+        }
+
+        function stopGame() {
+            
+        }		
+    </script>
+</body>
+
+</html>

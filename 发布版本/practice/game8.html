@@ -1,0 +1,191 @@
+<!doctype html><html><head><title>注意力反应练习</title><meta http-equiv="content-type" content="text/html;charset=utf-8"><link rel="stylesheet" href="../css/bootstrap.min.css"><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/font-awesome/css/font-awesome.min.css"><script src="../js/jquery.min.js"></script><script src="../js/bootstrap.min.js"></script><script src="../js/commonfunc.js"></script><script type="text/javascript" src="../js/js.cookie.js"></script><style>#divRect {
+left: 2%;
+top: 5%;
+width: 96%;
+height: 85%;
+position: absolute;
+border: 1px solid silver;
+background-color: #8AC4FF;
+}
+.rect {
+width: 40%;
+height: 40%;
+background-color: white;
+background-repeat: no-repeat;
+background-position: center;
+position: absolute;
+border: 4px solid white;
+text-align: center;
+font-size: 16px;
+font-weight: bolder;
+background-color: white;
+}
+.number {
+font-size: 18px;
+text-align: center;
+font-weight: bolder;
+position: absolute;
+color: white;
+}</style><script type="text/javascript">
+var g_timerTip = null;
+var g_nTipStep = 0;
+var g_nQuestionId = 1;
+var m_nCurrentSelect = null;
+var g_ExcuteLoop = 30; 
+var g_nCurrentStatus = ""; 
+var g_nTimestamp = new Date(); 
+var g_nResultWaitTime = 5000; 
+var g_waitTimeout; 
+var g_waitChangeTimeout; 
+function initTips() {
+$("#tip1").html("本任务是限时任务，请在尽可能快的时间内点击正确的目标，目标出现的时间为随机");
+$("#tip2").html("");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "");
+$("#tippoint3").attr("class", "");
+$("#tippoint4").attr("class", "");
+$("#tippoint5").attr("class", "");
+$("#tippoint6").attr("class", "");
+}
+function startTips() {
+switch (g_nTipStep) {
+case 0:
+$("#tip1").html("这是<span style='color: limegreen; font-weight: bold'>正确的目标</span>，请在目标出现后最短时间内点击该目标");
+$("#tip2").html("<img src='../image/game8/ok.png' width='100px' height='100px'>");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "");
+$("#tippoint4").attr("class", "");
+$("#tippoint5").attr("class", "");
+break;
+case 1:
+$("#tip1").html("这是<span style='color: red; font-weight: bold'>错误的目标</span>，该目标出现后请不要点击，否则会认为错误操作");
+$("#tip2").html("<img src='../image/game8/bad.png' width='100px' height='100px'>");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "active");
+$("#tippoint4").attr("class", "");
+$("#tippoint5").attr("class", "");
+break;
+case 2:
+$("#tip1").html("目标出现之前，请勿点击，否则会被认为错误操作");
+$("#tip2").html("<span class='importantTip'>你即将进入练习环节，熟悉作答方式。<br></span>完成练习后，点击<span class='importantTip'>开始测试</span>按钮进行正式测试。");
+$("#tippoint1").attr("class", "active");
+$("#tippoint2").attr("class", "active");
+$("#tippoint3").attr("class", "active");
+$("#tippoint4").attr("class", "active");
+$("#tippoint5").attr("class", "");
+break;
+}
+g_nTipStep++;
+if (g_nTipStep == 4) {
+closeTip();
+}
+}
+function startGame() {
+initGameResult();
+showStartButton();
+}
+function stopGame() {
+}
+function readyForNextGame() {
+alert("测试结束！");
+window.location.reload();
+return;
+}
+function initGameResult() {
+$("#btnOk").attr("disabled", true);
+}
+function checkGameResult() {
+return false
+}
+function showResult() {}
+function clickButton() {
+startGame();
+}
+function showStartButton() {
+g_nCurrentStatus = "BEGIN";
+$("#rectClickArea").css("background-image", "url('../image/game8/button.png')");
+$("#dvReactionTime").html("");
+$("#dvButtonInfomation").html("开始测试");
+$("#dvButtonErrorInfo").html("");
+}
+function showWaitScreen() {
+g_nCurrentStatus = "WAIT";
+$("#rectClickArea").css("background-image", "url('../image/game8/ready.png')");
+$("#dvReactionTime").html("");
+$("#dvButtonInfomation").html("");
+$("#dvButtonErrorInfo").html("");
+}
+function showOKTarget() {
+g_nCurrentStatus = "OK_SHOW";
+$("#rectClickArea").css("background-image", "url('../image/game8/ok.png')");
+$("#dvReactionTime").html("");
+$("#dvButtonInfomation").html("");
+$("#dvButtonErrorInfo").html("");
+g_nTimestamp = new Date();
+g_waitTimeout = setTimeout(showStartButton, g_nResultWaitTime);
+}
+function showBadTarget() {
+g_nCurrentStatus = "BAD_SHOW";
+$("#rectClickArea").css("background-image", "url('../image/game8/bad.png')");
+$("#dvReactionTime").html("");
+$("#dvButtonInfomation").html("");
+$("#dvButtonErrorInfo").html("");
+g_waitTimeout = setTimeout(showStartButton, g_nResultWaitTime);
+}
+function showReactionResult(milsecs) {
+g_nCurrentStatus = "OK_RESULT";
+$("#rectClickArea").css("background-image", "url('../image/game8/button.png')");
+$("#dvReactionTime").html("" + milsecs + "&nbsp;毫秒");
+$("#dvButtonInfomation").html("请点击此按钮<br/>继续测试");
+g_ExcuteLoop--;
+}
+function showErrorSelection() {
+g_nCurrentStatus = "BADSEL_RESULT";
+$("#rectClickArea").css("background-image", "url('../image/game8/error.png')");
+$("#dvReactionTime").html("");
+$("#dvButtonInfomation").html("");
+$("#dvButtonErrorInfo").html("错误！<br/>原因：点击了错误目标！");
+g_ExcuteLoop--;
+}
+function showErrorPreclick() {
+g_nCurrentStatus = "PRECLICK_RESULT";
+$("#rectClickArea").css("background-image", "url('../image/game8/error.png')");
+$("#dvReactionTime").html("");
+$("#dvButtonInfomation").html("");
+$("#dvButtonErrorInfo").html("错误！<br/>原因：提前点击！");
+g_ExcuteLoop--;
+}
+function userClickHandler() {
+if (g_ExcuteLoop <= 0) {
+return;
+}
+if (g_nCurrentStatus == "BEGIN") {
+showWaitScreen();
+var milsecWait = Math.random() * 5000 + 4000;
+if (Math.random() > 0.5) {
+g_waitChangeTimeout = setTimeout(showOKTarget, milsecWait);
+} else {
+g_waitChangeTimeout = setTimeout(showBadTarget, milsecWait);
+}
+} else if (g_nCurrentStatus == "WAIT") {
+clearTimeout(g_waitChangeTimeout);
+showErrorPreclick();
+} else if (g_nCurrentStatus == "OK_SHOW") {
+var timeNow = new Date();
+var timeGap = timeNow - g_nTimestamp;
+showReactionResult(timeGap);
+} else if (g_nCurrentStatus == "BAD_SHOW") {
+showErrorSelection();
+} else {
+showStartButton();
+}
+clearTimeout(g_waitTimeout);
+if (g_ExcuteLoop <= 0) {
+readyForNextGame();
+}
+}
+$(function() {
+$("#rectClickArea").click(userClickHandler);
+});</script></head><body><div id="divRect"><table style="width: 100%; height: 100%"><tr style="height: 5%"><td style="width: 10%"></td><td></td><td style="width: 10%"></td></tr><tr><td></td><td align="center" valign="middle"><div id="rectClickArea" style="width: 400px; height: 400px"><div id="dvReactionTime" style="padding-top: 140px; font-size: 24px; font-weight: bolder; color: white"></div><div id="dvButtonInfomation" style="padding-top: 20px; font-size: 36px; font-weight: bolder; color: white"></div><div id="dvButtonErrorInfo" style="padding-top: 0px; font-size: 36px; font-weight: bolder; color: black"></div></div></td><td></td></tr><tr style="height: 5%"><td></td><td></td><td></td></tr></table></div><button id="btnGame1" class="btnGame1 fa fa-home fa-2x" type="button" onclick="window.location = '../index.html';">返回主页</button> <button id="btnResultTip" class="btnResultTip" type="button"></button> <button id="btnOk" class="btnOk" type="button" disabled="disabled" onclick="clickButton()">开始测试</button> <button id="btnShowTip" type="button" onclick="showTip()">❓指导语</button><div id="divTip"><div class="panel panel-primary mypanel"><div class="panel-heading"><h3 class="panel-title center">答题说明</h3><button type="button" class="close tipclosebtn" onclick="closeTip()">&times;</button></div><div class="panel-body mypanelbody"><p id="tip1">你将在屏幕上看到5张图片。</p><p id="tip2"></p><ol class="carousel-indicators iter"><li id="tippoint1" class="active" data-slide-to="0"></li><li id="tippoint2" data-slide-to="1"></li><li id="tippoint3" data-slide-to="2"></li><li id="tippoint4" data-slide-to="3"></li><li id="tippoint5" data-slide-to="4"></li></ol></div></div></div><script type="text/javascript">showTip();</script></body></html>
